@@ -1,0 +1,22 @@
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.dcg-mq-cursor.dcg-mq-should-blink {
+  animation: blink 1s step-start 0.5s infinite;
+}
+
+// copied from expressions.scss
+//override mathquill math field's gray border and blue focus glow
+.dcg-mq-editable-field {
+  border: none;
+  box-shadow: none !important;
+}
+
+.dcg-mq-editable-field {
+  textarea {
+    resize: none;
+  }
+}
