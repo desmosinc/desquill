@@ -56,7 +56,7 @@ export class MqController {
    * Unintentional blurred: selection appears gray, and point cursor is hidden.
    * Blurred: selection and point cursor are both hidden.
    */
-  private focusState: FocusState;
+  private focusState: FocusState = 'blurred';
   private mostRecentAriaMessage: string = '';
   private showGrouping: boolean = true;
   private showGroupingTimeout: undefined | number;
@@ -273,13 +273,16 @@ export class MqController {
         const dir = action.type === 'jump-to-field-end' ? 'right' : 'left';
         const root = this.getRoot();
         const end = root.lastCursorInDir(dir);
-        const rootMathSpeak = getMathspeak(root, this.model.config);
+        const rootMathSpeak = getMathspeak(
+          root,
+          this.model.getMathspeakOptions()
+        );
         const expr = computeFinalMathspeak(
           this.model.getAriaLabel(),
           rootMathSpeak,
           this.model.getAriaPostLabel()
         );
-        const aria = this.model.config.localize(
+        const aria = this.model.s(
           dir === 'left' ? 'mq-narration-beginning-of' : 'mq-narration-end-of',
           { expr }
         );
@@ -401,14 +404,15 @@ export class MqController {
           this.model.selection.anchor,
           minHead
         );
-        const { autoOperatorNames, localize } = this.model.config;
-        const opts = { autoOperatorNames, localize };
         this.model = this.model
           .withSelection(newSelection)
           .withIsSelecting(true);
         if (!isSelectionCollapsed(newSelection)) {
           this.model = this.model.withAriaQueueItem(
-            getMathspeakForSelection(newSelection, opts)
+            getMathspeakForSelection(
+              newSelection,
+              this.model.getMathspeakOptions()
+            )
           );
         }
         break;
@@ -466,10 +470,11 @@ export class MqController {
 
       case 'speak-aria-post-after-timeout':
         if (this.getFocusState() === 'focused') {
-          const { autoOperatorNames, localize } = this.model.config;
-          const opts = { autoOperatorNames, localize };
           this.model = this.model.withAriaQueueItem(
-            getMathspeak(this.getRoot(), opts).trim() +
+            getMathspeak(
+              this.getRoot(),
+              this.model.getMathspeakOptions()
+            ).trim() +
               ' ' +
               this.model.getAriaPostLabel().trim()
           );
@@ -483,7 +488,7 @@ export class MqController {
         if (parentOfContainingGroup) {
           this.model = this.model.withAriaQueueNode(parentOfContainingGroup);
         } else {
-          const aria = this.model.config.localize('mq-narration-nothing-above');
+          const aria = this.model.s('mq-narration-nothing-above');
           this.model = this.model.withAriaQueueItem(aria);
         }
         break;
@@ -494,8 +499,7 @@ export class MqController {
         if (containingGroup.numChildren() > 0) {
           this.model = this.model.withAriaQueueNode(containingGroup);
         } else {
-          const { localize } = this.model.config;
-          const aria = localize('mq-narration-block-is-empty');
+          const aria = this.model.s('mq-narration-block-is-empty');
           this.model = this.model.withAriaQueueItem(aria);
         }
         break;
@@ -506,23 +510,23 @@ export class MqController {
         const parentOfContainingGroup =
           this.model.selection.head.group.parent();
         const sibling = parentOfContainingGroup?.nextSiblingInDir(action.dir);
-        const { localize } = this.model.config;
         if (sibling) {
           this.model = this.model.withAriaQueueNode(sibling);
         } else if (action.dir === 'right') {
-          const aria = localize('mq-narration-nothing-to-the-right');
+          const aria = this.model.s('mq-narration-nothing-to-the-right');
           this.model = this.model.withAriaQueueItem(aria);
         } else {
-          const aria = localize('mq-narration-nothing-to-the-left');
+          const aria = this.model.s('mq-narration-nothing-to-the-left');
           this.model = this.model.withAriaQueueItem(aria);
         }
         break;
       }
       case 'speak-selection': {
-        const { autoOperatorNames, localize } = this.model.config;
-        const opts = { autoOperatorNames, localize };
         this.model = this.model.withAriaQueueItem(
-          getMathspeakForSelection(this.model.selection, opts)
+          getMathspeakForSelection(
+            this.model.selection,
+            this.model.getMathspeakOptions()
+          )
         );
         break;
       }
@@ -531,7 +535,7 @@ export class MqController {
         if (ariaPostLabel.length > 0) {
           this.model = this.model.withAriaQueueItem(ariaPostLabel);
         } else {
-          const aria = this.model.config.localize('mq-narration-no-answer');
+          const aria = this.model.s('mq-narration-no-answer');
           this.model = this.model.withAriaQueueItem(aria);
         }
         break;

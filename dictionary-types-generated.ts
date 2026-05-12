@@ -3,14 +3,16 @@ export type KeysWithNoVariables =
 'mq-narration-absolute-value'
 | 'mq-narration-absolute-value-end'
 | 'mq-narration-absolute-value-start'
-| 'mq-narration-angle-bracket'
 | 'mq-narration-approximately-equal'
+| 'mq-narration-block-angle-bracket'
+| 'mq-narration-block-brace'
+| 'mq-narration-block-bracket'
+| 'mq-narration-block-double-vertical-line'
 | 'mq-narration-block-is-empty'
-| 'mq-narration-bold-font'
+| 'mq-narration-block-parenthesis'
+| 'mq-narration-block-pipe'
 | 'mq-narration-bound-lower'
 | 'mq-narration-bound-upper'
-| 'mq-narration-brace'
-| 'mq-narration-bracket'
 | 'mq-narration-capital-upsilon'
 | 'mq-narration-choose'
 | 'mq-narration-circle'
@@ -21,7 +23,6 @@ export type KeysWithNoVariables =
 | 'mq-narration-divided-by'
 | 'mq-narration-dollar'
 | 'mq-narration-double-prime'
-| 'mq-narration-double-vertical-line'
 | 'mq-narration-empty-subscript-was-deleted'
 | 'mq-narration-end'
 | 'mq-narration-equals'
@@ -33,11 +34,15 @@ export type KeysWithNoVariables =
 | 'mq-narration-index-upper'
 | 'mq-narration-infinity'
 | 'mq-narration-integral'
-| 'mq-narration-italic-font'
+| 'mq-narration-left-angle-bracket'
+| 'mq-narration-left-brace'
+| 'mq-narration-left-bracket'
+| 'mq-narration-left-double-vertical-line'
+| 'mq-narration-left-parenthesis'
+| 'mq-narration-left-pipe'
 | 'mq-narration-less-than'
 | 'mq-narration-less-than-or-equal-to'
 | 'mq-narration-math-input'
-| 'mq-narration-math-text'
 | 'mq-narration-measured-angle'
 | 'mq-narration-minus'
 | 'mq-narration-minus-or-plus'
@@ -53,6 +58,10 @@ export type KeysWithNoVariables =
 | 'mq-narration-nothing-to-the-right'
 | 'mq-narration-numerator'
 | 'mq-narration-op-abs'
+| 'mq-narration-op-angle'
+| 'mq-narration-op-anglebisector'
+| 'mq-narration-op-angles'
+| 'mq-narration-op-arc'
 | 'mq-narration-op-arccos'
 | 'mq-narration-op-arccosh'
 | 'mq-narration-op-arccot'
@@ -61,6 +70,7 @@ export type KeysWithNoVariables =
 | 'mq-narration-op-arccsch'
 | 'mq-narration-op-arcosh'
 | 'mq-narration-op-arcoth'
+| 'mq-narration-op-arcs'
 | 'mq-narration-op-arcsch'
 | 'mq-narration-op-arcsec'
 | 'mq-narration-op-arcsech'
@@ -68,6 +78,7 @@ export type KeysWithNoVariables =
 | 'mq-narration-op-arcsinh'
 | 'mq-narration-op-arctan'
 | 'mq-narration-op-arctanh'
+| 'mq-narration-op-area'
 | 'mq-narration-op-arg'
 | 'mq-narration-op-arsech'
 | 'mq-narration-op-arsinh'
@@ -76,15 +87,20 @@ export type KeysWithNoVariables =
 | 'mq-narration-op-boxplot'
 | 'mq-narration-op-cdf'
 | 'mq-narration-op-ceil'
+| 'mq-narration-op-center'
 | 'mq-narration-op-chisqdist'
 | 'mq-narration-op-chisqgof'
 | 'mq-narration-op-chisqtest'
+| 'mq-narration-op-circle'
+| 'mq-narration-op-circles'
 | 'mq-narration-op-conf'
 | 'mq-narration-op-conj'
+| 'mq-narration-op-construction'
 | 'mq-narration-op-corr'
 | 'mq-narration-op-cos'
 | 'mq-narration-op-cosh'
 | 'mq-narration-op-cot'
+| 'mq-narration-op-coterminal'
 | 'mq-narration-op-coth'
 | 'mq-narration-op-count'
 | 'mq-narration-op-cov'
@@ -92,9 +108,14 @@ export type KeysWithNoVariables =
 | 'mq-narration-op-csc'
 | 'mq-narration-op-csch'
 | 'mq-narration-op-det'
+| 'mq-narration-op-dilate'
+| 'mq-narration-op-directedangle'
+| 'mq-narration-op-directedangles'
+| 'mq-narration-op-discretedist'
 | 'mq-narration-op-distance'
 | 'mq-narration-op-dof'
 | 'mq-narration-op-dotplot'
+| 'mq-narration-op-end'
 | 'mq-narration-op-erf'
 | 'mq-narration-op-estimate'
 | 'mq-narration-op-exp'
@@ -103,16 +124,20 @@ export type KeysWithNoVariables =
 | 'mq-narration-op-gcd'
 | 'mq-narration-op-gcf'
 | 'mq-narration-op-geodist'
+| 'mq-narration-op-glider'
 | 'mq-narration-op-height'
 | 'mq-narration-op-histogram'
 | 'mq-narration-op-hsv'
 | 'mq-narration-op-imag'
+| 'mq-narration-op-intersection'
 | 'mq-narration-op-inv'
 | 'mq-narration-op-inversecdf'
 | 'mq-narration-op-inverseCdf'
 | 'mq-narration-op-join'
 | 'mq-narration-op-lcm'
 | 'mq-narration-op-length'
+| 'mq-narration-op-line'
+| 'mq-narration-op-lines'
 | 'mq-narration-op-ln'
 | 'mq-narration-op-log'
 | 'mq-narration-op-lower'
@@ -132,22 +157,33 @@ export type KeysWithNoVariables =
 | 'mq-narration-op-okhsv'
 | 'mq-narration-op-oklab'
 | 'mq-narration-op-oklch'
+| 'mq-narration-op-parallel'
 | 'mq-narration-op-pdf'
+| 'mq-narration-op-perimeter'
+| 'mq-narration-op-perpendicular'
 | 'mq-narration-op-pleft'
+| 'mq-narration-op-points'
 | 'mq-narration-op-poissondist'
 | 'mq-narration-op-polygon'
+| 'mq-narration-op-polygons'
 | 'mq-narration-op-pright'
 | 'mq-narration-op-quantile'
 | 'mq-narration-op-quartile'
+| 'mq-narration-op-radius'
 | 'mq-narration-op-random'
+| 'mq-narration-op-ray'
+| 'mq-narration-op-rays'
 | 'mq-narration-op-real'
+| 'mq-narration-op-reflect'
 | 'mq-narration-op-repeat'
 | 'mq-narration-op-rgb'
+| 'mq-narration-op-rotate'
 | 'mq-narration-op-round'
 | 'mq-narration-op-rref'
 | 'mq-narration-op-score'
 | 'mq-narration-op-sec'
 | 'mq-narration-op-sech'
+| 'mq-narration-op-segments'
 | 'mq-narration-op-sgn'
 | 'mq-narration-op-shuffle'
 | 'mq-narration-op-sign'
@@ -156,6 +192,8 @@ export type KeysWithNoVariables =
 | 'mq-narration-op-sinh'
 | 'mq-narration-op-sort'
 | 'mq-narration-op-spearman'
+| 'mq-narration-op-sphere'
+| 'mq-narration-op-start'
 | 'mq-narration-op-stats'
 | 'mq-narration-op-stddev'
 | 'mq-narration-op-stdDev'
@@ -164,12 +202,17 @@ export type KeysWithNoVariables =
 | 'mq-narration-op-stderr'
 | 'mq-narration-op-stdev'
 | 'mq-narration-op-stdevp'
+| 'mq-narration-op-strictintersection'
+| 'mq-narration-op-supplement'
 | 'mq-narration-op-tan'
 | 'mq-narration-op-tanh'
 | 'mq-narration-op-tdist'
+| 'mq-narration-op-tone'
 | 'mq-narration-op-total'
 | 'mq-narration-op-trace'
+| 'mq-narration-op-translate'
 | 'mq-narration-op-transpose'
+| 'mq-narration-op-triangle'
 | 'mq-narration-op-tscore'
 | 'mq-narration-op-TScore'
 | 'mq-narration-op-ttest'
@@ -179,20 +222,15 @@ export type KeysWithNoVariables =
 | 'mq-narration-op-var'
 | 'mq-narration-op-variance'
 | 'mq-narration-op-varp'
+| 'mq-narration-op-vector'
+| 'mq-narration-op-vertices'
 | 'mq-narration-op-width'
 | 'mq-narration-op-with'
 | 'mq-narration-op-zproptest'
 | 'mq-narration-op-ztest'
 | 'mq-narration-over'
-| 'mq-narration-over-arc'
-| 'mq-narration-over-left-and-right-arrow'
-| 'mq-narration-over-left-arrow'
-| 'mq-narration-over-right-arrow'
-| 'mq-narration-overline'
-| 'mq-narration-parenthesis'
 | 'mq-narration-percent-of'
 | 'mq-narration-perpendicular'
-| 'mq-narration-pipe'
 | 'mq-narration-plus'
 | 'mq-narration-plus-or-minus'
 | 'mq-narration-positive'
@@ -203,18 +241,64 @@ export type KeysWithNoVariables =
 | 'mq-narration-product'
 | 'mq-narration-question-mark'
 | 'mq-narration-radicand'
+| 'mq-narration-right-angle-bracket'
+| 'mq-narration-right-brace'
+| 'mq-narration-right-bracket'
+| 'mq-narration-right-double-vertical-line'
+| 'mq-narration-right-parenthesis'
+| 'mq-narration-right-pipe'
 | 'mq-narration-root'
 | 'mq-narration-selected'
-| 'mq-narration-serif-font'
-| 'mq-narration-start'
+| 'mq-narration-similar'
+| 'mq-narration-start-fraction'
 | 'mq-narration-start-root'
+| 'mq-narration-style-bold-font'
+| 'mq-narration-style-bold-font-end'
+| 'mq-narration-style-bold-font-start'
+| 'mq-narration-style-dot'
+| 'mq-narration-style-dot-end'
+| 'mq-narration-style-dot-start'
+| 'mq-narration-style-hat'
+| 'mq-narration-style-hat-end'
+| 'mq-narration-style-hat-start'
+| 'mq-narration-style-italic-font'
+| 'mq-narration-style-italic-font-end'
+| 'mq-narration-style-italic-font-start'
+| 'mq-narration-style-math-text'
+| 'mq-narration-style-math-text-end'
+| 'mq-narration-style-math-text-start'
+| 'mq-narration-style-over-arc'
+| 'mq-narration-style-over-arc-end'
+| 'mq-narration-style-over-arc-start'
+| 'mq-narration-style-over-left-and-right-arrow'
+| 'mq-narration-style-over-left-and-right-arrow-end'
+| 'mq-narration-style-over-left-and-right-arrow-start'
+| 'mq-narration-style-over-left-arrow'
+| 'mq-narration-style-over-left-arrow-end'
+| 'mq-narration-style-over-left-arrow-start'
+| 'mq-narration-style-over-right-arrow'
+| 'mq-narration-style-over-right-arrow-end'
+| 'mq-narration-style-over-right-arrow-start'
+| 'mq-narration-style-overline'
+| 'mq-narration-style-overline-end'
+| 'mq-narration-style-overline-start'
+| 'mq-narration-style-serif-font'
+| 'mq-narration-style-serif-font-end'
+| 'mq-narration-style-serif-font-start'
+| 'mq-narration-style-tilde'
+| 'mq-narration-style-tilde-end'
+| 'mq-narration-style-tilde-start'
+| 'mq-narration-style-underline'
+| 'mq-narration-style-underline-end'
+| 'mq-narration-style-underline-start'
+| 'mq-narration-style-vec'
+| 'mq-narration-style-vec-end'
+| 'mq-narration-style-vec-start'
 | 'mq-narration-subscript'
 | 'mq-narration-sum'
 | 'mq-narration-superscript'
-| 'mq-narration-tilde'
 | 'mq-narration-times'
-| 'mq-narration-token'
-| 'mq-narration-underline';
+| 'mq-narration-token';
 
 export type KeyToVariables<T> = {
   'mq-narration-after': {
@@ -229,9 +313,6 @@ export type KeyToVariables<T> = {
   'mq-narration-binomial': {
     'num': T,
     'den': T
-  },
-  'mq-narration-block': {
-    'bracket': T
   },
   'mq-narration-cube-root': {
     'radicand': T
@@ -253,9 +334,6 @@ export type KeyToVariables<T> = {
     'numPrefix': T,
     'full': T
   },
-  'mq-narration-left': {
-    'bracket': T
-  },
   'mq-narration-nth-root': {
     'index': T,
     'radicand': T
@@ -271,17 +349,31 @@ export type KeyToVariables<T> = {
     'category': T,
     'power': T
   },
-  'mq-narration-right': {
-    'bracket': T
-  },
   'mq-narration-square-root': {
     'radicand': T
+  },
+  'mq-narration-style-color-end': {
+    'color': T
+  },
+  'mq-narration-style-color-start': {
+    'color': T
   },
   'mq-narration-sub': {
     'sub': T
   },
-  'mq-narration-summation': {
-    'kind': T,
+  'mq-narration-summation-co-product': {
+    'start': T,
+    'end': T
+  },
+  'mq-narration-summation-integral': {
+    'start': T,
+    'end': T
+  },
+  'mq-narration-summation-product': {
+    'start': T,
+    'end': T
+  },
+  'mq-narration-summation-sum': {
     'start': T,
     'end': T
   },

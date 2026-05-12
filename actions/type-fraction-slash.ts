@@ -22,7 +22,7 @@ import {
 type FractionMode = 'frac' | 'binom';
 
 export function typeFractionSlash(model: MqModel, mode: FractionMode): MqModel {
-  const overMathspeak = model.config.localize(
+  const overMathspeak = model.s(
     mode === 'frac' ? 'mq-narration-over' : 'mq-narration-choose'
   );
   if (!isSelectionCollapsed(model.selection)) {
@@ -33,13 +33,11 @@ export function typeFractionSlash(model: MqModel, mode: FractionMode): MqModel {
     );
   }
   // Collapsed selection. Scan left then make a fraction.
-  // TODO-mq-rewrite-quirk: this says "over" even it there is nothing in the numerator,
-  // like typing `/` from `\left(<!>\right)`
-  return collapsedCursorTypeSlash(
-    model,
-    model.selection.head,
-    mode
-  ).withAriaQueueItem(overMathspeak);
+  model = collapsedCursorTypeSlash(model, model.selection.head, mode);
+  const frac = model.selection.head.group.parent();
+  return frac?.type === 'frac' && frac.num.numChildren() === 0
+    ? model.withAriaQueueItem(model.s('mq-narration-start-fraction'))
+    : model.withAriaQueueItem(overMathspeak);
 }
 
 function collapsedCursorTypeSlash(

@@ -1,8 +1,9 @@
 import { shouldDisplayAsBinaryOperator } from './binary-operators';
 import type { LeftOrRight } from './cursor';
 import type { KeysWithNoVariables } from './dictionary-types-generated';
+import { localizableNumericValue } from './i18n/localizable-numeric-value';
 import type { AutoOperatorNames } from './mq-config';
-import { localizableNumericValue, type LocalizeFunction } from './mq-i18n';
+import { type LookupWithLanguageBinding } from './mq-i18n-interface';
 import { doesMarkEndAtNode, doesMarkStartAtNode } from './mq-marks';
 import {
   fracOrBinomPropName,
@@ -22,10 +23,11 @@ import {
 import { isSelectionCollapsed, type MqSelection } from './selection';
 import { isTextBlock } from './style-commands';
 
-interface MathspeakOptions {
-  readonly ignoreShorthand?: boolean;
+export interface MathspeakOptions {
+  readonly ignoreShorthand: boolean;
   readonly autoOperatorNames: AutoOperatorNames;
-  readonly localize: LocalizeFunction;
+  readonly localize: LookupWithLanguageBinding;
+  readonly language: string;
 }
 
 const mathspeakMap: { [key: string]: KeysWithNoVariables | '' | undefined } = {
@@ -36,7 +38,7 @@ const mathspeakMap: { [key: string]: KeysWithNoVariables | '' | undefined } = {
   '>': 'mq-narration-greater-than',
   '\\ge': 'mq-narration-greater-than-or-equal-to',
   '\\le': 'mq-narration-less-than-or-equal-to',
-  '\\sim': 'mq-narration-tilde',
+  '\\sim': 'mq-narration-similar',
   '=': 'mq-narration-equals',
   '\\approx': 'mq-narration-approximately-equal',
   '\\ne': 'mq-narration-not-equal',
@@ -63,7 +65,10 @@ const mathspeakMap: { [key: string]: KeysWithNoVariables | '' | undefined } = {
   '~': ''
 };
 
-function mapSymbolToMathSpeak(symbol: string, localize: LocalizeFunction) {
+function mapSymbolToMathSpeak(
+  symbol: string,
+  localize: LookupWithLanguageBinding
+) {
   const mapped = mathspeakMap[symbol];
   if (mapped === '') return '';
   if (mapped !== undefined) return localize(mapped);
@@ -151,21 +156,18 @@ function getMathspeakForGroup(group: MqGroup, opts: MathspeakOptions) {
         continue;
       } else if (doesMarkEndAtNode(group.marks.mutable_operatorName, i)) {
         partialOperatorName += child.latex;
-        // TODO-mq-rewrite-quirk -- we actually want to put a space between these operatornames but old mathquill does not
-        // do that. We are concatenating them all together only for comparison purposes.
-        if (!doesMarkStartAtNode(group.marks.mutable_operatorName, i + 1)) {
-          // This will convert things like "cos" to "cosine" by looking up the mathspeak for the autoOperatorName.
-          let operatorNameMathspeak = '';
-          const key = opts.autoOperatorNames?.get(partialOperatorName);
-          if (typeof key == 'string' && key.startsWith('mq-narration-op')) {
-            operatorNameMathspeak = opts.localize(key as KeysWithNoVariables);
-          } else if (typeof key == 'string' && key != '') {
-            operatorNameMathspeak = key;
-          }
-          out += operatorNameMathspeak || partialOperatorName;
-          out += ' ';
-          partialOperatorName = '';
+
+        // This will convert things like "cos" to "cosine" by looking up the mathspeak for the autoOperatorName.
+        let operatorNameMathspeak = '';
+        const key = opts.autoOperatorNames?.get(partialOperatorName);
+        if (typeof key == 'string' && key.startsWith('mq-narration-op')) {
+          operatorNameMathspeak = opts.localize(key as KeysWithNoVariables);
+        } else if (typeof key == 'string' && key != '') {
+          operatorNameMathspeak = key;
         }
+        out += operatorNameMathspeak || partialOperatorName;
+        out += ' ';
+        partialOperatorName = '';
         continue;
       } else if (partialOperatorName) {
         partialOperatorName += child.latex;
@@ -275,29 +277,74 @@ export const summationMathspeakMap = {
   '\\prod': 'mq-narration-product',
   '\\coprod': 'mq-narration-co-product'
 } as const;
+const summationTemplateMap = {
+  '\\int': 'mq-narration-summation-integral',
+  '\\sum': 'mq-narration-summation-sum',
+  '\\prod': 'mq-narration-summation-product',
+  '\\coprod': 'mq-narration-summation-co-product'
+} as const;
 function getMathspeakForSummation(
   summation: MqSummation,
   opts: MathspeakOptions
 ) {
-  const kind = opts.localize(summationMathspeakMap[summation.kind]);
   const start = getMathspeakForGroup(summation.sub, opts);
   const end = getMathspeakForGroup(summation.sup, opts);
-  return opts.localize('mq-narration-summation', { kind, start, end });
+  // Trailing comma cues a pause before whatever follows the summation in the
+  // surrounding mathspeak. Kept in code rather than the dictionary so each
+  // localized template can read as a clean self-contained sentence.
+  return (
+    opts.localize(summationTemplateMap[summation.kind], { start, end }) + ','
+  );
 }
 
-const bracketMathspeakMap: { [key: string]: KeysWithNoVariables } = {
-  '(': 'mq-narration-parenthesis',
-  ')': 'mq-narration-parenthesis',
-  '|': 'mq-narration-pipe',
-  '{': 'mq-narration-brace',
-  '}': 'mq-narration-brace',
-  '[': 'mq-narration-bracket',
-  ']': 'mq-narration-bracket',
-  langle: 'mq-narration-angle-bracket',
-  rangle: 'mq-narration-angle-bracket',
-  lVert: 'mq-narration-double-vertical-line',
-  rVert: 'mq-narration-double-vertical-line'
+type BracketKind =
+  | 'angle-bracket'
+  | 'brace'
+  | 'bracket'
+  | 'double-vertical-line'
+  | 'parenthesis'
+  | 'pipe';
+
+const bracketSymbolToKind: { [key: string]: BracketKind } = {
+  '(': 'parenthesis',
+  ')': 'parenthesis',
+  '|': 'pipe',
+  '{': 'brace',
+  '}': 'brace',
+  '[': 'bracket',
+  ']': 'bracket',
+  langle: 'angle-bracket',
+  rangle: 'angle-bracket',
+  lVert: 'double-vertical-line',
+  rVert: 'double-vertical-line'
 } as const;
+
+const leftBracketKey: { [K in BracketKind]: KeysWithNoVariables } = {
+  'angle-bracket': 'mq-narration-left-angle-bracket',
+  brace: 'mq-narration-left-brace',
+  bracket: 'mq-narration-left-bracket',
+  'double-vertical-line': 'mq-narration-left-double-vertical-line',
+  parenthesis: 'mq-narration-left-parenthesis',
+  pipe: 'mq-narration-left-pipe'
+};
+
+const rightBracketKey: { [K in BracketKind]: KeysWithNoVariables } = {
+  'angle-bracket': 'mq-narration-right-angle-bracket',
+  brace: 'mq-narration-right-brace',
+  bracket: 'mq-narration-right-bracket',
+  'double-vertical-line': 'mq-narration-right-double-vertical-line',
+  parenthesis: 'mq-narration-right-parenthesis',
+  pipe: 'mq-narration-right-pipe'
+};
+
+const blockBracketKey: { [K in BracketKind]: KeysWithNoVariables } = {
+  'angle-bracket': 'mq-narration-block-angle-bracket',
+  brace: 'mq-narration-block-brace',
+  bracket: 'mq-narration-block-bracket',
+  'double-vertical-line': 'mq-narration-block-double-vertical-line',
+  parenthesis: 'mq-narration-block-parenthesis',
+  pipe: 'mq-narration-block-pipe'
+};
 
 export function getMathspeakForBracketSide(
   brackets: MqBrackets,
@@ -305,9 +352,8 @@ export function getMathspeakForBracketSide(
   opts: MathspeakOptions
 ) {
   const symbol = mqBracketSymbol(brackets, side);
-  const bracketKey = bracketMathspeakMap[symbol];
-  if (!bracketKey) return '';
-  const bracket = opts.localize(bracketKey);
+  const kind = bracketSymbolToKind[symbol];
+  if (!kind) return '';
 
   const { leftSymbol, rightSymbol } = brackets;
   if (leftSymbol === '|' && rightSymbol === '|') {
@@ -318,15 +364,13 @@ export function getMathspeakForBracketSide(
     );
   }
 
-  return side === 'left'
-    ? opts.localize('mq-narration-left', { bracket })
-    : opts.localize('mq-narration-right', { bracket });
+  return opts.localize(
+    side === 'left' ? leftBracketKey[kind] : rightBracketKey[kind]
+  );
 }
 
 function getMathspeakForBrackets(brackets: MqBrackets, opts: MathspeakOptions) {
   const { leftSymbol, rightSymbol } = brackets;
-  const leftMathspeak = opts.localize(bracketMathspeakMap[leftSymbol]);
-  const rightMathspeak = opts.localize(bracketMathspeakMap[rightSymbol]);
 
   if (leftSymbol === '|' && rightSymbol === '|') {
     return [
@@ -337,11 +381,18 @@ function getMathspeakForBrackets(brackets: MqBrackets, opts: MathspeakOptions) {
     ].join(' ');
   }
 
+  const leftKind = bracketSymbolToKind[leftSymbol];
+  const rightKind = bracketSymbolToKind[rightSymbol];
+  const leftSpeech = leftKind ? opts.localize(leftBracketKey[leftKind]) : '';
+  const rightSpeech = rightKind
+    ? opts.localize(rightBracketKey[rightKind])
+    : '';
+
   return [
     '',
-    opts.localize('mq-narration-left', { bracket: leftMathspeak ?? '' }) + ',',
+    leftSpeech + ',',
     getMathspeakForGroup(brackets.middle, opts) + ' ,',
-    opts.localize('mq-narration-right', { bracket: rightMathspeak ?? '' })
+    rightSpeech
   ].join(' ');
 }
 
@@ -384,7 +435,7 @@ function getMathspeakForIntegerPower(group: MqGroup, opts: MathspeakOptions) {
     // @fluent/bundle 0.19 silently drops `NUMBER(x, type: "ordinal")`, so we drive the
     // selector on a plain CLDR ordinal category string computed by the localize function
     // (which is bound to the active language).
-    const category = opts.localize.ordinalCategory(magnitude);
+    const category = ordinalCategory(magnitude, opts.language);
     const power = `${magnitude}`;
     return sign === '-'
       ? opts.localize('mq-narration-power-negative-ordinal', {
@@ -396,6 +447,11 @@ function getMathspeakForIntegerPower(group: MqGroup, opts: MathspeakOptions) {
 
   const power = getMathspeakForGroup(group, opts);
   return opts.localize('mq-narration-power', { power });
+}
+
+function ordinalCategory(value: number, language: string): Intl.LDMLPluralRule {
+  const categorizer = new Intl.PluralRules(language, { type: 'ordinal' });
+  return categorizer.select(value);
 }
 
 function getMathspeakForSupSub(supsub: MqSupSub, opts: MathspeakOptions) {
@@ -428,46 +484,176 @@ export function getAriaLabelForStyleCmd(
       return ' ' + styleCmd.styleParam;
 
     case '\\mathbf':
-      return opts.localize('mq-narration-bold-font');
+      return opts.localize('mq-narration-style-bold-font');
 
     case '\\mathit':
-      return opts.localize('mq-narration-italic-font');
+      return opts.localize('mq-narration-style-italic-font');
 
     case '\\mathrm':
       // intentionally no wrapper for this one
       return '';
 
     case '\\mathsf':
-      return opts.localize('mq-narration-serif-font');
+      return opts.localize('mq-narration-style-serif-font');
 
     case '\\mathtt':
-      return opts.localize('mq-narration-math-text');
+      return opts.localize('mq-narration-style-math-text');
 
     case '\\overarc':
-      return opts.localize('mq-narration-over-arc');
+      return opts.localize('mq-narration-style-over-arc');
 
     case '\\overleftarrow':
-      return opts.localize('mq-narration-over-left-arrow');
+      return opts.localize('mq-narration-style-over-left-arrow');
 
     case '\\overleftrightarrow':
-      return opts.localize('mq-narration-over-left-and-right-arrow');
+      return opts.localize('mq-narration-style-over-left-and-right-arrow');
 
     case '\\overline':
-      return opts.localize('mq-narration-overline');
+      return opts.localize('mq-narration-style-overline');
 
     case '\\overrightarrow':
-      return opts.localize('mq-narration-over-right-arrow');
+      return opts.localize('mq-narration-style-over-right-arrow');
 
     case '\\underline':
-      return opts.localize('mq-narration-underline');
+      return opts.localize('mq-narration-style-underline');
 
     case '\\dot':
+      return opts.localize('mq-narration-style-dot');
+
     case '\\tilde':
+      return opts.localize('mq-narration-style-tilde');
+
     case '\\hat':
+      return opts.localize('mq-narration-style-hat');
+
     case '\\vec':
-      // TODO-mq-localize: this is just raw '\vec' right now.
-      // Not relevant to Desmos, but Amplify may be using these latexes.
-      return styleCmd.val;
+      return opts.localize('mq-narration-style-vec');
+
+    default:
+      styleCmd.val satisfies never;
+      return '';
+  }
+}
+
+export function getAriaLabelForStartStyleCmd(
+  styleCmd: MqStyleCmd,
+  opts: MathspeakOptions
+) {
+  switch (styleCmd.val) {
+    case '\\textcolor':
+      return opts.localize('mq-narration-style-color-start', {
+        color: styleCmd.styleParam ?? ''
+      });
+
+    case '\\mathbf':
+      return opts.localize('mq-narration-style-bold-font-start');
+
+    case '\\mathit':
+      return opts.localize('mq-narration-style-italic-font-start');
+
+    case '\\mathrm':
+      // intentionally no wrapper for this one
+      return '';
+
+    case '\\mathsf':
+      return opts.localize('mq-narration-style-serif-font-start');
+
+    case '\\mathtt':
+      return opts.localize('mq-narration-style-math-text-start');
+
+    case '\\overarc':
+      return opts.localize('mq-narration-style-over-arc-start');
+
+    case '\\overleftarrow':
+      return opts.localize('mq-narration-style-over-left-arrow-start');
+
+    case '\\overleftrightarrow':
+      return opts.localize(
+        'mq-narration-style-over-left-and-right-arrow-start'
+      );
+
+    case '\\overline':
+      return opts.localize('mq-narration-style-overline-start');
+
+    case '\\overrightarrow':
+      return opts.localize('mq-narration-style-over-right-arrow-start');
+
+    case '\\underline':
+      return opts.localize('mq-narration-style-underline-start');
+
+    case '\\dot':
+      return opts.localize('mq-narration-style-dot-start');
+
+    case '\\tilde':
+      return opts.localize('mq-narration-style-tilde-start');
+
+    case '\\hat':
+      return opts.localize('mq-narration-style-hat-start');
+
+    case '\\vec':
+      return opts.localize('mq-narration-style-vec-start');
+
+    default:
+      styleCmd.val satisfies never;
+      return '';
+  }
+}
+
+export function getAriaLabelForEndStyleCmd(
+  styleCmd: MqStyleCmd,
+  opts: MathspeakOptions
+) {
+  switch (styleCmd.val) {
+    case '\\textcolor':
+      return opts.localize('mq-narration-style-color-end', {
+        color: styleCmd.styleParam ?? ''
+      });
+
+    case '\\mathbf':
+      return opts.localize('mq-narration-style-bold-font-end');
+
+    case '\\mathit':
+      return opts.localize('mq-narration-style-italic-font-end');
+
+    case '\\mathrm':
+      // intentionally no wrapper for this one
+      return '';
+
+    case '\\mathsf':
+      return opts.localize('mq-narration-style-serif-font-end');
+
+    case '\\mathtt':
+      return opts.localize('mq-narration-style-math-text-end');
+
+    case '\\overarc':
+      return opts.localize('mq-narration-style-over-arc-end');
+
+    case '\\overleftarrow':
+      return opts.localize('mq-narration-style-over-left-arrow-end');
+
+    case '\\overleftrightarrow':
+      return opts.localize('mq-narration-style-over-left-and-right-arrow-end');
+
+    case '\\overline':
+      return opts.localize('mq-narration-style-overline-end');
+
+    case '\\overrightarrow':
+      return opts.localize('mq-narration-style-over-right-arrow-end');
+
+    case '\\underline':
+      return opts.localize('mq-narration-style-underline-end');
+
+    case '\\dot':
+      return opts.localize('mq-narration-style-dot-end');
+
+    case '\\tilde':
+      return opts.localize('mq-narration-style-tilde-end');
+
+    case '\\hat':
+      return opts.localize('mq-narration-style-hat-end');
+
+    case '\\vec':
+      return opts.localize('mq-narration-style-vec-end');
 
     default:
       styleCmd.val satisfies never;
@@ -476,20 +662,10 @@ export function getAriaLabelForStyleCmd(
 }
 
 function getMathspeakForStyleCmd(styleCmd: MqStyleCmd, opts: MathspeakOptions) {
-  const middleMathspeak = getMathspeakForGroup(styleCmd.arg, opts);
-
-  const wrapper = getAriaLabelForStyleCmd(styleCmd, opts);
-
-  const startWrapper =
-    wrapper === styleCmd.val ? 'Start' + wrapper : 'Start' + wrapper + ',';
-  // TODO-mq-rewrite-quirk -- reproduce a bug in old mq
-  const endWrapper = wrapper === styleCmd.val ? 'undefined' : 'End' + wrapper;
-
-  if (wrapper) {
-    return startWrapper + ' ' + middleMathspeak + ' ' + endWrapper;
-  } else {
-    return middleMathspeak;
-  }
+  const middle = getMathspeakForGroup(styleCmd.arg, opts);
+  const start = getAriaLabelForStartStyleCmd(styleCmd, opts);
+  const end = getAriaLabelForEndStyleCmd(styleCmd, opts);
+  return start ? start + ', ' + middle + ' ' + end : middle;
 }
 
 function maybeReadOnlyCharsFromGroup(group: MqGroup) {
@@ -579,8 +755,8 @@ export function ariaLabelOfNthChild(
       if (node.leftLatex === '|' && node.rightLatex === '|') {
         return opts.localize('mq-narration-absolute-value');
       }
-      const bracket = opts.localize(bracketMathspeakMap[node.leftLatex]);
-      return opts.localize('mq-narration-block', { bracket });
+      const kind = bracketSymbolToKind[node.leftLatex];
+      return kind ? opts.localize(blockBracketKey[kind]) : '';
     case 'sqrt':
       if (node.index === undefined) {
         return opts.localize('mq-narration-root');

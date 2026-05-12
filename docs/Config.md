@@ -4,6 +4,7 @@ The configuration options object is `UnprocessedMqConfig`, specified in `mq-conf
 
 ```js
 mq.config({
+  localize: bundledLocalize,
   resetCursorOnBlur: true,
   autoSubscriptNumerals: true,
   supSubsRequireOperand: true,
@@ -13,6 +14,8 @@ mq.config({
   restrictMismatchedBrackets: 'none'
 });
 ```
+
+Note that a `localize` function is required to be passed in. Consumers can typically simply pass `MQ.bundledLocalize` for this. (That is not a default, to support tree-shaking its implementation in Desmos, which has its own localization machinery that this duplicates).
 
 You can configure an editable math field by passing an options argument as the second argument to [the constructor (`MQ.MathField(html_element, config)`)](Api_Methods.md#mqmathfieldhtml_element--config-), or by [calling `.config()` on the math field (`mathField.config(new_config)`)](Api_Methods.md#confignew_config).
 

@@ -149,7 +149,7 @@ function renderGroup(
   group: MqGroup,
   groupParent: HTMLElement
 ) {
-  // TODO-mq-rewrite-perf -- this is another type of mark. I think it probably is 100% render-only so
+  // This is another type of mark. I think it probably is 100% render-only so
   // I'm implementing that during the render pass. We should eventually think about the role of marks
   // and where they should be computed. It seems like we keep finding new types of marks that are unique
   // in some way and we aren't converging on a definite answer.
@@ -365,18 +365,10 @@ function renderSupSub(
     index - 1
   );
 
-  let shouldAddAfterOperatorNameClass = false;
-  if (isAfterOperatorName && !shouldOmitPadding(supSub)) {
-    // TODO-mq-rewrite-quirk -- The `(supSub.sub && supSub.sup)` condition says don't add
-    // the dcg-mq-after-operator-name class if there's a sup and a sub. This is to match
-    // old MQ behavior because in old MQ e.g. `\log_{1}^{2}` goes through two steps:
-    // first with the sup and sub separate, then with them merged together. The second step did not preserve the class.
-    if (!(siblingRight?.type == 'brackets' || (supSub.sub && supSub.sup))) {
-      shouldAddAfterOperatorNameClass = true;
-    } else {
-      shouldAddAfterOperatorNameClass = false;
-    }
-  }
+  const shouldAddAfterOperatorNameClass =
+    isAfterOperatorName &&
+    !shouldOmitPadding(supSub) &&
+    siblingRight?.type !== 'brackets';
 
   const node = createNode(parent, 'span', '', {
     className:

@@ -63,6 +63,7 @@ export function scrollHoriz(mqController: MqController) {
       scheduleNext();
       rootDom.scrollLeft = Math.round(start + progress * scrollBy);
     }
+    setOverflowClass(mqController);
   });
 }
 
@@ -103,4 +104,14 @@ function getScrollBy(selection: MqSelection, rootRect: DOMRect): number {
       } else return 0;
     }
   }
+}
+
+export function setOverflowClass(mqController: MqController) {
+  const root = mqController.getRoot();
+  const rootDom = root.getDomNode();
+  if (!rootDom) return;
+
+  const overflowLeft = rootDom.scrollLeft > 0;
+
+  rootDom.classList.toggle('dcg-mq-editing-overflow-left', overflowLeft);
 }

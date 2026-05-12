@@ -1,6 +1,6 @@
 import { Cursor, type LeftOrRight, swapDir } from '../cursor';
 import {
-  getAriaLabelForStyleCmd,
+  getAriaLabelForStartStyleCmd,
   getBareMathspeakForSelection,
   getMathspeakForBracketSide,
   summationMathspeakMap
@@ -42,14 +42,15 @@ const replaceMapIfDeletingLeftward: Record<string, string> = {
 };
 
 export function deleteInDir(model: MqModel, dir: LeftOrRight): MqModel {
-  const { autoOperatorNames, localize } = model.config;
-  const opts = { autoOperatorNames, localize };
   const selection = model.selection;
   if (isSelectionCollapsed(selection)) {
     return collapsedCursorDeleteInDir(model, selection.anchor, dir);
   }
   // Delete the selection
-  const deletedNodesMathspeak = getBareMathspeakForSelection(selection, opts);
+  const deletedNodesMathspeak = getBareMathspeakForSelection(
+    selection,
+    model.getMathspeakOptions()
+  );
   const { root, insertedSelection } = spliceMqTree(selection, []);
   return model
     .withRootAndSelection(root, insertedSelection)
@@ -57,8 +58,6 @@ export function deleteInDir(model: MqModel, dir: LeftOrRight): MqModel {
 }
 
 export function ctrlDeleteInDir(model: MqModel, dir: LeftOrRight): MqModel {
-  const { autoOperatorNames, localize } = model.config;
-  const opts = { autoOperatorNames, localize };
   const selection = model.selection;
   if (
     !isSelectionCollapsed(selection) ||
@@ -71,7 +70,7 @@ export function ctrlDeleteInDir(model: MqModel, dir: LeftOrRight): MqModel {
   const deletedSelection = makeSelection(cursor, farEnd)!;
   const deletedNodesMathspeak = getBareMathspeakForSelection(
     deletedSelection,
-    opts
+    model.getMathspeakOptions()
   );
   const { root, insertedSelection } = spliceMqTree(deletedSelection, []);
   return model
@@ -103,10 +102,11 @@ function allGroupsAreEmpty(node: MqNonGroup) {
 
 /** Delete the given node, and place the cursor at the deleted portion. */
 function deleteNode(model: MqModel, node: MqNonGroup): MqModel {
-  const { autoOperatorNames, localize } = model.config;
-  const opts = { autoOperatorNames, localize };
   const selection = node.containingSelection();
-  const deletedNodesMathspeak = getBareMathspeakForSelection(selection, opts);
+  const deletedNodesMathspeak = getBareMathspeakForSelection(
+    selection,
+    model.getMathspeakOptions()
+  );
   const { root, insertedSelection } = spliceMqTree(selection, []);
   return model
     .withRootAndSelection(root, insertedSelection)
@@ -132,8 +132,6 @@ function deleteTowards(
   node: MqNonGroup,
   dir: LeftOrRight
 ): MqModel {
-  const { autoOperatorNames, localize } = model.config;
-  const opts = { autoOperatorNames, localize };
   switch (node.type) {
     case 'style-cmd': {
       if (allGroupsAreEmpty(node)) {
@@ -158,7 +156,10 @@ function deleteTowards(
           return model
             .withRootAndSelection(root, selection)
             .withAriaQueueItem(
-              getBareMathspeakForSelection(deletedSelection, opts)
+              getBareMathspeakForSelection(
+                deletedSelection,
+                model.getMathspeakOptions()
+              )
             );
         }
       }
@@ -198,7 +199,10 @@ function deleteTowards(
             makePointSelection(insertedSelection.left)
           )
           .withAriaQueueItem(
-            getBareMathspeakForSelection(deletedSelection, opts)
+            getBareMathspeakForSelection(
+              deletedSelection,
+              model.getMathspeakOptions()
+            )
           );
       }
 
@@ -240,7 +244,7 @@ function deleteTowards(
         } else {
           // No child was deleted, but we still want ARIA here to state that the empty subscript was deleted.
           model = model.withAriaQueueItem(
-            localize('mq-narration-empty-subscript-was-deleted')
+            model.s('mq-narration-empty-subscript-was-deleted')
           );
         }
         const newNode = mappedSupSub;
@@ -296,7 +300,6 @@ function deleteOutOf(
   group: MqGroup,
   dir: LeftOrRight
 ): MqModel {
-  const { localize } = model.config;
   const parent = group.parent();
   if (parent === undefined) {
     // deleting left from the leftmost point or right from the rightmost point.
@@ -320,7 +323,7 @@ function deleteOutOf(
       const point = getSelectionSide(selection, dir);
       // Here we just queue "Over" because only the fraction bar is deleted;
       // the numerator and denominator are left behind.
-      const deleted = localize(
+      const deleted = model.s(
         node.type === 'frac' ? 'mq-narration-over' : 'mq-narration-choose'
       );
       return model
@@ -334,15 +337,13 @@ function deleteOutOf(
         node.arg.children
       );
       const point = getSelectionSide(insertedSelection, dir);
-      const { autoOperatorNames, localize } = model.config;
-      const opts = { autoOperatorNames, localize };
+      const aria = getAriaLabelForStartStyleCmd(
+        node,
+        model.getMathspeakOptions()
+      );
       return model
         .withRootAndSelection(root, makePointSelection(point))
-        .withAriaQueueItem(
-          localize('mq-narration-start') +
-            getAriaLabelForStyleCmd(node, opts) +
-            ','
-        );
+        .withAriaQueueItem(aria);
     }
     case 'sqrt': {
       const prop = sqrtPropName(node, index);
@@ -363,7 +364,7 @@ function deleteOutOf(
           .withRootAndSelection(root, makePointSelection(point))
           // Here we just queue "StartRoot," because only the root itself is deleted;
           // the index and radicand are left behind.
-          .withAriaQueueItem(localize('mq-narration-start-root') + ',')
+          .withAriaQueueItem(model.s('mq-narration-start-root') + ',')
       );
     }
     case 'summation': {
@@ -384,7 +385,7 @@ function deleteOutOf(
       const point = getSelectionSide(selection, dir);
       // Here we just queue "sum" or "product" because only the summation itself is deleted;
       // the upper bound and lower bound are left behind.
-      const deleted = model.config.localize(summationMathspeakMap[node.kind]);
+      const deleted = model.s(summationMathspeakMap[node.kind]);
 
       return model
         .withRootAndSelection(root, makePointSelection(point))
@@ -411,7 +412,7 @@ function deleteOutOf(
           const point = getSelectionSide(supSel, dir);
           return model
             .withRootAndSelection(root, makePointSelection(point))
-            .withAriaQueueItem(localize('mq-narration-superscript'));
+            .withAriaQueueItem(model.s('mq-narration-superscript'));
         } else {
           // Replace `^{sup}` with `sup`, and put cursor left/right of 'sup'.
           const { root, insertedSelection } = spliceMqTree(
@@ -421,7 +422,7 @@ function deleteOutOf(
           const point = getSelectionSide(insertedSelection, dir);
           return model
             .withRootAndSelection(root, makePointSelection(point))
-            .withAriaQueueItem(localize('mq-narration-superscript'));
+            .withAriaQueueItem(model.s('mq-narration-superscript'));
         }
       } else {
         prop satisfies 'sub';
@@ -441,7 +442,7 @@ function deleteOutOf(
           const point = getSelectionSide(subSel, dir);
           return model
             .withRootAndSelection(root, makePointSelection(point))
-            .withAriaQueueItem(localize('mq-narration-subscript'));
+            .withAriaQueueItem(model.s('mq-narration-subscript'));
         } else {
           // Replace `_{sub}` with `sub`, and put cursor left/right of 'sub'.
           const { root, insertedSelection } = spliceMqTree(
@@ -451,7 +452,7 @@ function deleteOutOf(
           const point = getSelectionSide(insertedSelection, dir);
           return model
             .withRootAndSelection(root, makePointSelection(point))
-            .withAriaQueueItem(localize('mq-narration-subscript'));
+            .withAriaQueueItem(model.s('mq-narration-subscript'));
         }
       }
     }
@@ -472,12 +473,10 @@ function deleteSideOfBracket(
   outward: boolean
 ): MqModel {
   const otherSide = swapDir(side);
-  const { localize, autoOperatorNames } = model.config;
-  const opts = { localize, autoOperatorNames };
   const deletedBracketMathspeak = getMathspeakForBracketSide(
     bracket,
     side,
-    opts
+    model.getMathspeakOptions()
   );
 
   {

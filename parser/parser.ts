@@ -236,10 +236,6 @@ function parseCustom(
       );
     }
     case 'fragment': {
-      // TODO-mq-rewrite-behavior -- currently a bug in MQ for latex `\sum⁶`. This expands to `\sum_{ }^{ }^{6}` but only AFTER
-      // the \sum has been finalized. So the 6 does not go into the superscript of the sum. If you copy that expanded
-      // latex and paste it back in it then becomes: `\sum_{ }^{6}`
-
       const replacement = getFragmentReplacement(ctrlSeq);
       if (!replacement) return undefined;
 

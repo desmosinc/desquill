@@ -7,7 +7,7 @@ import {
   type KeyboardEventsController,
   saneKeyboardEvents
 } from './sane-keyboard-events';
-import { scrollHoriz } from './scroll-horiz';
+import { scrollHoriz, setOverflowClass } from './scroll-horiz';
 
 export class MqView {
   private rootElt: HTMLElement;
@@ -16,12 +16,6 @@ export class MqView {
   private ariaAlertElt: HTMLSpanElement;
   private mathspeakElt: HTMLElement;
   private controller: MqController;
-
-  // TODO-mq-rewrite-behavior -- it's not clear to me where this should actually be stored. Probably on the model along with the
-  // the root. I think the only reason it's here is that computing the mathspeak depends on some info only available after
-  // doing a render. Things like finding the parent node and left sibling node. If those lookups could happen on top
-  // of the main tree then we could probably decouple this from the rendering step pretty trivially.
-  private _cachedRootMathspeak: string = '';
 
   private scrollHorizQueued = false;
 
@@ -201,23 +195,19 @@ export class MqView {
 
     this.setTextareaSelection();
 
-    const { autoOperatorNames, localize } = model.config;
-    const opts = { autoOperatorNames, localize };
-    const updatedMathspeak = getMathspeak(model.root, opts);
-
-    if (updatedMathspeak !== undefined) {
-      this._cachedRootMathspeak = updatedMathspeak;
-    }
-
     const ariaLabel = model.getAriaLabel();
 
+    // Do not update the mathspeak when focused, to prevent double-speech.
+    // The mathspeak will update when it's blurred.
+    // (Updating the aria-label attribute of a focused element will cause most screen readers to announce the new value)
     if (this.controller.getFocusState() !== 'focused') {
-      // Do not update the mathspeak when focused, to prevent double-speech.
-      // The mathspeak will update when it's blurred.
-      // (Updating the aria-label attribute of a focused element will cause most screen readers to announce the new value)
+      const updatedMathspeak = getMathspeak(
+        model.root,
+        model.getMathspeakOptions()
+      );
       this.mathspeakElt.textContent = computeFinalMathspeak(
         ariaLabel,
-        this._cachedRootMathspeak,
+        updatedMathspeak,
         model.getAriaPostLabel()
       );
     }
@@ -251,6 +241,8 @@ export class MqView {
         scrollHoriz(this.controller);
       });
     }
+
+    setOverflowClass(this.controller);
   }
 
   /**
@@ -258,6 +250,15 @@ export class MqView {
    * and `textarea.selectionStart` works, used for `hasSelection` in sane-keyboard-events.
    */
   setTextareaSelection() {
+    if (document.activeElement !== this.textarea) {
+      // Normally this is impossible when the selection is nonempty
+      // because a blur would clear the selection. However, sometimes a
+      // mq event can be dispatched _between_ when a different element
+      // is focused and when the blur is actually dispatched, such as
+      // if mq config tabindex is updated in the same synchronous JS that
+      // also focuses an element than the mathquill textarea.
+      return;
+    }
     const selection = this.controller.getLatexSelection();
     const text = selection.latex.slice(
       selection.startIndex,
@@ -265,6 +266,7 @@ export class MqView {
     );
     this.textarea.value = text;
     if (text !== '') {
+      // This focuses the textarea as well, but the textarea is already focused, so no problem.
       this.textarea.select();
     }
   }
@@ -315,6 +317,9 @@ export class MqView {
         clientX: evt.clientX,
         target: lastMousemoveTarget
       });
+      if (this.textarea !== document.activeElement) {
+        this.focus();
+      }
       lastMousemoveTarget = undefined;
     };
 

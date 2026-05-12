@@ -5,7 +5,15 @@ import {
   type MqConfig,
   mutableMarksProps
 } from './mq-config';
-import { ariaLabelOfNthChild, getMathspeak } from './mq-mathspeak';
+import {
+  bindLanguageToLookup,
+  type LookupWithLanguageBinding
+} from './mq-i18n-interface';
+import {
+  ariaLabelOfNthChild,
+  getMathspeak,
+  type MathspeakOptions
+} from './mq-mathspeak';
 import {
   clearDerivedStateOnGroup,
   makeGroup,
@@ -32,6 +40,7 @@ export class MqModel {
   readonly isSelecting: boolean;
   private readonly ariaLabel: string = '';
   private readonly ariaPostLabel: string = '';
+  public s: LookupWithLanguageBinding;
 
   ariaQueue: string[] = [];
   domToMqNode: Map<HTMLElement, MqNode> | undefined;
@@ -57,6 +66,8 @@ export class MqModel {
     this.ariaLabel = ariaLabel;
     this.ariaPostLabel = ariaPostLabel;
     this.ariaQueue = queuedAriaItems;
+
+    this.s = bindLanguageToLookup(this.config.localize, this.config.language);
 
     if (selection.left.group.getRoot() !== root) {
       throw new Error('Programming Error: selection must be inside root');
@@ -199,12 +210,10 @@ export class MqModel {
     // since doing so may be ambiguous or confusing.
     // For example, `x^2` normally has mathspeak '"x" squared', but when moving the cursor before the exponent,
     // it speaks 'before Superscript, 2 , Baseline' since the alternative is 'before squared'.
-    const { autoOperatorNames, localize } = this.config;
-    let output = getMathspeak(node, {
-      ignoreShorthand,
-      autoOperatorNames,
-      localize
-    });
+    let output = getMathspeak(
+      node,
+      this.getMathspeakOptions({ ignoreShorthand })
+    );
 
     if (shouldDescribe && node.type === 'group') {
       output = getAriaLabel(this, node) + ' ' + output;
@@ -213,26 +222,24 @@ export class MqModel {
   }
 
   withAriaQueueDirOf(dir: LeftOrRight, node: MqNode) {
-    const { autoOperatorNames, localize } = this.config;
-    const opts = { ignoreShorthand: true, autoOperatorNames, localize };
-    const expr = getMathspeak(node, opts);
+    const expr = getMathspeak(
+      node,
+      this.getMathspeakOptions({ ignoreShorthand: true })
+    );
     return this.withAriaQueueItem(
-      this.config.localize(
-        dir === 'left' ? 'mq-narration-before' : 'mq-narration-after',
-        { expr }
-      )
+      this.s(dir === 'left' ? 'mq-narration-before' : 'mq-narration-after', {
+        expr
+      })
     );
   }
 
   withAriaQueueDirEndOf(dir: LeftOrRight, node: MqNode) {
-    const { autoOperatorNames, localize } = this.config;
-    const opts = { autoOperatorNames, localize };
-    let expr = getMathspeak(node, opts);
+    let expr = getMathspeak(node, this.getMathspeakOptions());
     if (node.type === 'group') {
       expr = getAriaLabel(this, node) + ' ' + expr;
     }
     return this.withAriaQueueItem(
-      this.config.localize(
+      this.s(
         dir === 'left' ? 'mq-narration-beginning-of' : 'mq-narration-end-of',
         { expr }
       )
@@ -276,13 +283,22 @@ export class MqModel {
 
   getAriaLabel() {
     if (!this.ariaLabel && !this.config.static) {
-      return this.config.localize('mq-narration-math-input');
+      return this.s('mq-narration-math-input');
     }
     return this.ariaLabel;
   }
 
   getAriaPostLabel() {
     return this.ariaPostLabel;
+  }
+
+  getMathspeakOptions(opts?: { ignoreShorthand?: boolean }): MathspeakOptions {
+    return {
+      ignoreShorthand: opts?.ignoreShorthand ?? false,
+      autoOperatorNames: this.config.autoOperatorNames,
+      localize: this.s,
+      language: this.config.language
+    };
   }
 }
 
@@ -299,7 +315,9 @@ function getAriaLabel(model: MqModel, group: MqGroup) {
     return model.getAriaLabel();
   }
   // Other groups have aria labels like "numerator" or "superscript".
-  const { autoOperatorNames, localize } = model.config;
-  const opts = { autoOperatorNames, localize };
-  return ariaLabelOfNthChild(parent, group.getIndex()!, opts);
+  return ariaLabelOfNthChild(
+    parent,
+    group.getIndex()!,
+    model.getMathspeakOptions()
+  );
 }

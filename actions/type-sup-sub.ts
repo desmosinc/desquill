@@ -69,7 +69,7 @@ export function typeSupSub(model: MqModel, supsub: 'sup' | 'sub'): MqModel {
   const insertedGroup = inserted.sup ?? inserted.sub!;
   const selection = makePointSelection(insertedGroup.lastCursor());
   model = model.withRootAndSelection(root, selection);
-  const aria = model.config.localize(
+  const aria = model.s(
     supsub === 'sup' ? 'mq-narration-superscript' : 'mq-narration-subscript'
   );
   return model.withAriaQueueItem(aria);

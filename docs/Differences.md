@@ -14,3 +14,5 @@ Removed config properties:
 - `tripleDotsAreEllipsis` (now treated as true always)
 - `disableAutoSubstitutionInSubscripts` (now treated as `{except: 'log'}`).
 - `handlers`
+
+New MQ supports localization of its ARIA and mathspeak messages. The `localize` config option is required, see [Config](Config.md).

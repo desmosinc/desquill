@@ -423,7 +423,9 @@ export function saneKeyboardEvents(
 
         const selectedLatex = controller.cut();
         evt.clipboardData.setData('text/plain', selectedLatex);
+        evt.clipboardData.setData('application/x-latex', selectedLatex);
         evt.preventDefault();
+        evt.stopPropagation(); // otherwise list-view will do yellow-copy cut since there is now no selection
       },
       copy: function (evt: ClipboardEvent) {
         if (!evt.clipboardData) {

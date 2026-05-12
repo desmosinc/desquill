@@ -1,6 +1,6 @@
 import { isSpecialCommand } from './actions/type-char';
 import { entries } from './lib';
-import type { LocalizeFunction } from './mq-i18n';
+import type { LocalizeFunction } from './mq-i18n-interface';
 import { cmdToLatex, mapCtrlSeqAlias } from './parser/cmd-to-latex';
 
 export type MqConfig = MqPassthroughConfig & MqPostParsedConfig;
@@ -41,6 +41,7 @@ interface MqPassthroughConfig {
   onPaste?: () => void;
   onCut?: () => void;
   localize: LocalizeFunction;
+  language: string;
   maxDepth?: number;
   /** `static` is internal, used to tell apart the `MQ.StaticMath` and `MQ.MathField` constructors. */
   static: boolean;
@@ -379,16 +380,10 @@ let defaultMqConfig: MqConfig = {
   tabindex: undefined,
   quietEmptyDelimeters: parseQuietEmptyDelimeters('( ['),
   scrollAnimationDuration: 100,
-  localize: Object.assign(
-    () => {
-      throw new Error('Programming Error: mq localization function not set');
-    },
-    {
-      ordinalCategory: (): Intl.LDMLPluralRule => {
-        throw new Error('Programming Error: mq localization function not set');
-      }
-    }
-  )
+  localize: () => {
+    throw new Error('Programming Error: mq localization function not set');
+  },
+  language: 'en'
 };
 let configUsed = false;
 
@@ -407,166 +402,3 @@ export function updateDefaultMqConfig(newConfig: UnprocessedMqConfig) {
   }
   defaultMqConfig = updateConfig(defaultMqConfig, newConfig);
 }
-
-const desmosAutoOperatorNamesEntries = Object.entries({
-  exp: 'mq-narration-op-exp',
-  ln: 'mq-narration-op-ln',
-  log: 'mq-narration-op-log',
-  total: 'mq-narration-op-total',
-  length: 'mq-narration-op-length',
-  count: 'mq-narration-op-count',
-  mean: 'mq-narration-op-mean',
-  median: 'mq-narration-op-median',
-  quantile: 'mq-narration-op-quantile',
-  quartile: 'mq-narration-op-quartile',
-  nCr: 'mq-narration-op-nCr',
-  nPr: 'mq-narration-op-nPr',
-  stats: 'mq-narration-op-stats',
-  stdev: 'mq-narration-op-stdev',
-  stddev: 'mq-narration-op-stddev',
-  stdDev: 'mq-narration-op-stdDev',
-  stdevp: 'mq-narration-op-stdevp',
-  stddevp: 'mq-narration-op-stddevp',
-  stdDevP: 'mq-narration-op-stdDevP',
-  mad: 'mq-narration-op-mad',
-  var: 'mq-narration-op-var',
-  varp: 'mq-narration-op-varp',
-  variance: 'mq-narration-op-variance',
-  cov: 'mq-narration-op-cov',
-  covp: 'mq-narration-op-covp',
-  corr: 'mq-narration-op-corr',
-  spearman: 'mq-narration-op-spearman',
-  lcm: 'mq-narration-op-lcm',
-  mcm: 'mq-narration-op-mcm',
-  gcd: 'mq-narration-op-gcd',
-  mcd: 'mq-narration-op-mcd',
-  gcf: 'mq-narration-op-gcf',
-  mod: 'mq-narration-op-mod',
-  ceil: 'mq-narration-op-ceil',
-  floor: 'mq-narration-op-floor',
-  round: 'mq-narration-op-round',
-  abs: 'mq-narration-op-abs',
-  min: 'mq-narration-op-min',
-  max: 'mq-narration-op-max',
-  sign: 'mq-narration-op-sign',
-  signum: 'mq-narration-op-signum',
-  sgn: 'mq-narration-op-sgn',
-  sin: 'mq-narration-op-sin',
-  cos: 'mq-narration-op-cos',
-  tan: 'mq-narration-op-tan',
-  csc: 'mq-narration-op-csc',
-  sec: 'mq-narration-op-sec',
-  cot: 'mq-narration-op-cot',
-  sinh: 'mq-narration-op-sinh',
-  cosh: 'mq-narration-op-cosh',
-  tanh: 'mq-narration-op-tanh',
-  csch: 'mq-narration-op-csch',
-  sech: 'mq-narration-op-sech',
-  coth: 'mq-narration-op-coth',
-  arcsin: 'mq-narration-op-arcsin',
-  arccos: 'mq-narration-op-arccos',
-  arctan: 'mq-narration-op-arctan',
-  arccsc: 'mq-narration-op-arccsc',
-  arcsec: 'mq-narration-op-arcsec',
-  arccot: 'mq-narration-op-arccot',
-  arcsinh: 'mq-narration-op-arcsinh',
-  arccosh: 'mq-narration-op-arccosh',
-  arctanh: 'mq-narration-op-arctanh',
-  arccsch: 'mq-narration-op-arccsch',
-  arcsech: 'mq-narration-op-arcsech',
-  arccoth: 'mq-narration-op-arccoth',
-  arsinh: 'mq-narration-op-arsinh',
-  arcosh: 'mq-narration-op-arcosh',
-  artanh: 'mq-narration-op-artanh',
-  arcsch: 'mq-narration-op-arcsch',
-  arsech: 'mq-narration-op-arsech',
-  arcoth: 'mq-narration-op-arcoth',
-  polygon: 'mq-narration-op-polygon',
-  distance: 'mq-narration-op-distance',
-  midpoint: 'mq-narration-op-midpoint',
-  sort: 'mq-narration-op-sort',
-  shuffle: 'mq-narration-op-shuffle',
-  join: 'mq-narration-op-join',
-  unique: 'mq-narration-op-unique',
-  erf: 'mq-narration-op-erf',
-  ttest: 'mq-narration-op-ttest',
-  TScore: 'mq-narration-op-TScore',
-  tscore: 'mq-narration-op-tscore',
-  normaldist: 'mq-narration-op-normaldist',
-  tdist: 'mq-narration-op-tdist',
-  poissondist: 'mq-narration-op-poissondist',
-  binomialdist: 'mq-narration-op-binomialdist',
-  uniformdist: 'mq-narration-op-uniformdist',
-  chisqdist: 'mq-narration-op-chisqdist',
-  geodist: 'mq-narration-op-geodist',
-  pdf: 'mq-narration-op-pdf',
-  cdf: 'mq-narration-op-cdf',
-  random: 'mq-narration-op-random',
-  inverseCdf: 'mq-narration-op-inverseCdf',
-  inversecdf: 'mq-narration-op-inversecdf',
-  histogram: 'mq-narration-op-histogram',
-  dotplot: 'mq-narration-op-dotplot',
-  boxplot: 'mq-narration-op-boxplot',
-  rgb: 'mq-narration-op-rgb',
-  hsv: 'mq-narration-op-hsv',
-  okhsv: 'mq-narration-op-okhsv',
-  oklab: 'mq-narration-op-oklab',
-  oklch: 'mq-narration-op-oklch',
-  for: 'mq-narration-op-for',
-  width: 'mq-narration-op-width',
-  height: 'mq-narration-op-height',
-  with: 'mq-narration-op-with',
-  repeat: 'mq-narration-op-repeat',
-  real: 'mq-narration-op-real',
-  imag: 'mq-narration-op-imag',
-  conj: 'mq-narration-op-conj',
-  arg: 'mq-narration-op-arg',
-  det: 'mq-narration-op-det',
-  inv: 'mq-narration-op-inv',
-  transpose: 'mq-narration-op-transpose',
-  rref: 'mq-narration-op-rref',
-  trace: 'mq-narration-op-trace',
-  chisqtest: 'mq-narration-op-chisqtest',
-  chisqgof: 'mq-narration-op-chisqgof',
-  score: 'mq-narration-op-score',
-  conf: 'mq-narration-op-conf',
-  pleft: 'mq-narration-op-pleft',
-  pright: 'mq-narration-op-pright',
-  ztest: 'mq-narration-op-ztest',
-  zproptest: 'mq-narration-op-zproptest',
-  dof: 'mq-narration-op-dof',
-  estimate: 'mq-narration-op-estimate',
-  stderr: 'mq-narration-op-stderr',
-  null: 'mq-narration-op-null',
-  upper: 'mq-narration-op-upper',
-  lower: 'mq-narration-op-lower'
-});
-const desmosAutoOperatorNames = desmosAutoOperatorNamesEntries
-  .map(([k, v]) => `${k}|${v.split(' ').join('-')}`)
-  .join(' ');
-
-// Got this from `getAutoCommands()`.
-const desmosAutoCommands =
-  'alpha beta sqrt theta phi rho pi tau nthroot cbrt sum prod integral percent infinity infty cross ans frac';
-// Grepped for `additionalCommands` to see more that are used.
-const desmosAdditionalCommands = 'int div';
-
-/** Default config for our <MathquillView> fields. */
-export const desmosMqConfig: UnprocessedMqConfig = {
-  resetCursorOnBlur: true,
-  autoSubscriptNumerals: true,
-  supSubsRequireOperand: true,
-  autoOperatorNames: desmosAutoOperatorNames,
-  infixOperatorNames: 'for with',
-  prefixOperatorNames:
-    'ln log sin sinh arcsin arcsinh arsinh cos cosh arccos arccosh arcosh tan tanh arctan arctanh artanh cot coth arccot arccoth arcoth sec sech arcsec arcsech arsech csc csch arccsc arccsch arcsch',
-  autoCommands: desmosAutoCommands + ' ' + desmosAdditionalCommands,
-  leftRightIntoCmdGoes: 'up',
-  restrictMismatchedBrackets: 'none',
-  typingSlashWritesDivisionSymbol: false,
-  typingAsteriskWritesTimesSymbol: false,
-  typingPercentWritesPercentOf: true,
-  sumStartsWithNEquals: true,
-  charsThatBreakOutOfSupSub: '+-=<>*',
-  enableDigitGrouping: true
-};

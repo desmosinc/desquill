@@ -189,7 +189,11 @@ function finalizeAutoSubscript(
 }
 
 export function typeChar(model: MqModel, char: string): MqModel {
-  const { localize } = model.config;
+  if (char.match(/^[0-9]$/) && !isSelectionCollapsed(model.selection)) {
+    // allow autoSubscript to work by deleting selection first
+    const { root, insertedSelection } = spliceMqTree(model.selection, []);
+    model = model.withRootAndSelection(root, insertedSelection);
+  }
   const autoSubscriptedModel = autoSubscriptIfAppropriate(model, char);
   if (autoSubscriptedModel) return autoSubscriptedModel;
 
@@ -217,9 +221,10 @@ export function typeChar(model: MqModel, char: string): MqModel {
     case ')': {
       const sideTyped = char === '(' ? 'left' : 'right';
       ({ model } = typeBracket(model, sideTyped, '(', '(', ')', ')'));
-      const aria = localize(
-        sideTyped === 'left' ? 'mq-narration-left' : 'mq-narration-right',
-        { bracket: localize('mq-narration-parenthesis') }
+      const aria = model.s(
+        sideTyped === 'left'
+          ? 'mq-narration-left-parenthesis'
+          : 'mq-narration-right-parenthesis'
       );
       return model.withAriaQueueItem(aria);
     }
@@ -228,9 +233,10 @@ export function typeChar(model: MqModel, char: string): MqModel {
       const sideTyped = char === '[' ? 'left' : 'right';
       ({ model } = typeBracket(model, sideTyped, '[', '[', ']', ']'));
 
-      const aria = localize(
-        sideTyped === 'left' ? 'mq-narration-left' : 'mq-narration-right',
-        { bracket: localize('mq-narration-bracket') }
+      const aria = model.s(
+        sideTyped === 'left'
+          ? 'mq-narration-left-bracket'
+          : 'mq-narration-right-bracket'
       );
       return model.withAriaQueueItem(aria);
     }
@@ -238,23 +244,26 @@ export function typeChar(model: MqModel, char: string): MqModel {
     case '}': {
       const sideTyped = char === '{' ? 'left' : 'right';
       ({ model } = typeBracket(model, sideTyped, '{', '\\{', '}', '\\}'));
-      const aria = localize(
-        sideTyped === 'left' ? 'mq-narration-left' : 'mq-narration-right',
-        { bracket: localize('mq-narration-brace') }
+      const aria = model.s(
+        sideTyped === 'left'
+          ? 'mq-narration-left-brace'
+          : 'mq-narration-right-brace'
       );
       return model.withAriaQueueItem(aria);
     }
     case '|': {
       ({ model } = typeBracket(model, 'either', '|', '|', '|', '|'));
-      const { localize, autoOperatorNames } = model.config;
-      const opts = { localize, autoOperatorNames };
       const { head } = model.selection;
       const nodeBefore = head.nodeBefore();
       const bracket = nodeBefore ?? head.group.parent();
       if (bracket?.type !== 'brackets')
         throw new Error('Programming error: bracket expected');
       const side = nodeBefore ? 'right' : 'left';
-      const aria = getMathspeakForBracketSide(bracket, side, opts);
+      const aria = getMathspeakForBracketSide(
+        bracket,
+        side,
+        model.getMathspeakOptions()
+      );
       return model.withAriaQueueItem(aria);
     }
     case '=': {
@@ -275,6 +284,8 @@ export function typeChar(model: MqModel, char: string): MqModel {
       if (replaced) return replaced;
       break;
     }
+    case '\n':
+      return model;
     default: {
       const replaced = getFragmentReplacement(char);
       if (replaced.match(/^\^[0-9]$/)) {

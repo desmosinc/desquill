@@ -17,12 +17,9 @@ export function computeDigitGroupingClasses(
   ctx: MQRenderContext,
   children: MqNode[]
 ) {
-  // TODO-mq-rewrite-perf -- I think we could optimize / simplify this algorithm. I think one reason it's easier to
-  // simplify is that we aren't trying to do incremental updates to a tree. We always start with a fresh render
-  // without needing to figure out how to remove old digit separators in case of an edit.
-  // Ref. `computeEllipsisMarks`
+  // This is linear-time, using two passes. May be able to be simplified.
   //
-  // work from right to left collecting a contiguous region of DigitGroupingChars
+  // Work from right to left collecting a contiguous region of DigitGroupingChars
   let groupRight: number | undefined;
   for (let i = children.length - 1; i >= 0; i--) {
     if (isDigitGroupingChar(children[i])) {
@@ -90,9 +87,10 @@ function computeDigitGroupingInRegion(
     dots.pop();
     const leftDot = dots.pop()!;
 
-    // TODO-mq-rewrite-perf -- I updated this algorithm to recurse on the left side. That's slightly
+    // I updated this algorithm to recurse on the left side. That's slightly
     // less efficient but I think if we care about efficiency there's a good chance we can make
     // this entire algorithm more efficient.
+    // Probably the only concern is that stack size is linear in the number of dots, which isn't a worry.
     computeDigitGroupingInRegion(ctx, children, left, leftDot - 1);
     computeDigitGroupingInRegion(ctx, children, rightDot + 1, right);
     return;

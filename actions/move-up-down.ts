@@ -191,9 +191,9 @@ function jumpUpDown(
 }
 
 export function getCursorClientX(cursor: Cursor): number | undefined {
-  // TODO-mq-rewrite-behavior: This is using the adjacent nodes to determine the cursor position.
+  // This is using the adjacent nodes to determine the cursor position.
   // That probably isn't the most accurate because `boundingClientRect` doesn't include
-  // margin. Old MQ tracks the rendered cursor node, which we'd want to put in the MqModel.
+  // margin, but the margins are small enough this isn't noticeable.
   const nodeBefore = cursor.nodeBefore();
   if (nodeBefore) {
     return nodeBefore.boundingClientRect()?.right;

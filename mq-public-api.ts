@@ -15,6 +15,8 @@ import { type KeyboardEventsController } from './sane-keyboard-events';
 import type { MqSelection } from './selection';
 import { isEqual } from './vendor/underscore';
 
+export { bundledLocalize, bundledSupportedLanguages } from './i18n/mq-i18n';
+
 export function getApiInstanceForElement(
   elm: HTMLElement
 ): MqMathFieldApi | undefined {
@@ -129,9 +131,10 @@ export class MqMathFieldApi {
   }
 
   mathspeak(): string {
-    const { autoOperatorNames, localize } = this.controller.getConfig();
-    const opts = { autoOperatorNames, localize };
-    const mathspeak = getMathspeak(this.controller.getRoot(), opts);
+    const mathspeak = getMathspeak(
+      this.controller.getRoot(),
+      this.controller.getModel().getMathspeakOptions()
+    );
     return mathspeak.replace(/ {2,}/g, ' ');
   }
 
@@ -336,8 +339,6 @@ export class MqMathFieldApi {
   }
 
   private _typedTextSingle(ch: string) {
-    // Mathquill has the following special case here:
-    //   if (ch === '\n') return this.handle('enter');
     this.controller.dispatch({
       type: 'type-char',
       char: ch
@@ -455,13 +456,6 @@ export class MqMathFieldApi {
     return selected;
   }
 }
-
-// TODO-mq-rewrite-when-single -- if we update this we need to update the implementation in compare-branches as well
-// TODO-mq-rewrite-when-single: can delete `normalizeOldMQLatex` when single.
-export function normalizeOldMQLatex(latex: string) {
-  return latex;
-}
-
 export function config(newConfig: UnprocessedMqConfig) {
   updateDefaultMqConfig(newConfig);
 }
@@ -475,7 +469,6 @@ export const MQ = {
   MathField,
   EditableField,
   MqMathFieldApi,
-  normalizeOldMQLatex,
   config,
   isNewMathQuill
 };
