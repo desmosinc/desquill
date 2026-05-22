@@ -51,8 +51,8 @@ function printLatexUncleanForGroup(
 ) {
   let out = '';
   let partialOperatorName = '';
-  for (let i = 0; i < children.length; i++) {
-    const child = children[i];
+  for (const child of children) {
+    const i = child.getIndex();
     const childLatex = printLatexUnclean(child, opts);
 
     if (
@@ -164,8 +164,12 @@ function printLatexUnclean(node: MqNode, opts: PrintLatexOpts): string {
       const prefix = node.kind;
       const sub = printLatexUnclean(node.sub, opts);
       const sup = printLatexUnclean(node.sup, opts);
+      // ensure copy/paste of \sum_{n=1}^{2}{}^{3} round trips intact
+      const bugfix = node.nextSibling()?.type === 'supsub' ? '{}' : '';
       return (
-        prefix + `_{${singleSpaceIfEmpty(sub)}}^{${singleSpaceIfEmpty(sup)}}`
+        prefix +
+        `_{${singleSpaceIfEmpty(sub)}}^{${singleSpaceIfEmpty(sup)}}` +
+        bugfix
       );
     }
     case 'group': {

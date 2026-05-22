@@ -7,19 +7,18 @@ import {
   MqBinom,
   MqFrac,
   type MqGroup,
-  type MqNode,
-  nthChild,
-  numChildren
+  type MqNode
 } from '../mq-nodes';
 import {
   isSelectionCollapsed,
   makePointSelection,
   makeSelection,
+  removeGhostsFromSelection,
   sliceMqTree,
   spliceMqTreeSingle
 } from '../selection';
 
-type FractionMode = 'frac' | 'binom';
+export type FractionMode = 'frac' | 'binom';
 
 export function typeFractionSlash(model: MqModel, mode: FractionMode): MqModel {
   const overMathspeak = model.s(
@@ -67,21 +66,12 @@ function collapsedCursorTypeSlash(
   return makeFractionAndPutCursorInDenom(selectedLeftModel, mode);
 }
 
-export function removeGhosts(nodes: MqNode[]) {
-  for (const node of nodes) {
-    if (node.type === 'brackets') node.ghostSide = undefined;
-    for (let i = 0; i < numChildren(node); i++) {
-      removeGhosts([nthChild(node, i)]);
-    }
-  }
-  return nodes;
-}
-
 function makeFractionAndPutCursorInDenom(
   model: MqModel,
   mode: FractionMode
 ): MqModel {
-  const selected = removeGhosts(sliceMqTree(model.selection));
+  model = removeGhostsFromSelection(model);
+  const selected = sliceMqTree(model.selection);
   const fracConstructor = mode === 'frac' ? MqFrac : MqBinom;
   const insert = new fracConstructor({
     num: makeGroup(selected),

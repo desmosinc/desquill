@@ -3,16 +3,17 @@ import { makeGroup, type MqNode, MqSupSub } from '../mq-nodes';
 import {
   isSelectionCollapsed,
   makePointSelection,
+  removeGhostsFromSelection,
   sliceMqTree,
   spliceMqTree,
   spliceMqTreeSingle
 } from '../selection';
-import { removeGhosts } from './type-fraction-slash';
 
 export function typeSupSub(model: MqModel, supsub: 'sup' | 'sub'): MqModel {
   // Put the entire selection (if any) in a superscript,
   // then put the cursor at the end of that group
-  const selected = removeGhosts(sliceMqTree(model.selection));
+  model = removeGhostsFromSelection(model);
+  const selected = sliceMqTree(model.selection);
 
   // Try to weld with SupSub on left.
   const left = model.selection.left.nodeBefore();

@@ -1,10 +1,13 @@
 import { Cursor, type LeftOrRight } from './cursor';
+import type { MqModel } from './mq-model';
 import {
   makeGroup,
   type MqBrackets,
+  mqBracketWithGhostSide,
   type MqGroup,
   type MqNode
 } from './mq-nodes';
+import type { ExportedLatexSelection } from './mq-public-api';
 import { cursorToLatexIndex, printLatex } from './print-latex';
 import { copyCursorIndices } from './stash-cursors';
 
@@ -22,6 +25,20 @@ export type MqSelection = {
   readonly left: Cursor;
   readonly right: Cursor;
 };
+
+export function exportSelection(
+  selection: MqSelection
+): ExportedLatexSelection {
+  const { left, right, anchor, head } = selection;
+  const latex = printLatex(left.group.getRoot());
+  return {
+    latex,
+    startIndex: cursorToLatexIndex(left),
+    endIndex: cursorToLatexIndex(right),
+    anchorIndex: cursorToLatexIndex(anchor),
+    headIndex: cursorToLatexIndex(head)
+  };
+}
 
 /**
  * Visualize the selection, with `!` representing the anchor,
@@ -378,4 +395,34 @@ export function sliceMqTree(range: MqSelection): MqNode[] {
   // Note left.group === right.group
   const group = left.group;
   return group.children.slice(leftIndex, rightIndex);
+}
+
+/**
+ * Return first node in selection satisfying p. Includes children of nodes in selection.
+ */
+function findInSelection(
+  range: MqSelection,
+  p: (node: MqNode) => boolean
+): MqNode | undefined {
+  const children = range.left.group.children;
+  for (let i = range.left.index; i < range.right.index; i++) {
+    const found = children[i].find(p);
+    if (found) return found;
+  }
+  return undefined;
+}
+
+export function removeGhostsFromSelection(model: MqModel) {
+  while (true) {
+    const bracket = findInSelection(
+      model.selection,
+      (x) => x.type === 'brackets' && !!x.ghostSide
+    );
+    if (bracket?.type !== 'brackets') break;
+
+    model = model.withSplicedMqTree(bracket.containingSelection(), () => [
+      mqBracketWithGhostSide(bracket, undefined)
+    ]);
+  }
+  return model;
 }

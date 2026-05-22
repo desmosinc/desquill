@@ -516,8 +516,7 @@ export class MqBrackets extends MqNonGroupBase {
   public readonly rightSymbol: string;
   public readonly leftLatex: string;
   public readonly rightLatex: string;
-  // TODO-mq-rewrite-cleanup: ghostSide is not readonly.
-  public ghostSide: LeftOrRight | undefined;
+  public readonly ghostSide: LeftOrRight | undefined;
   public readonly middle: MqGroup;
 
   constructor({

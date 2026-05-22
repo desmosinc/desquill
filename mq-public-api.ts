@@ -50,10 +50,43 @@ export function MathField(container: HTMLElement, config: InitialConfig) {
 
 export const EditableField = MathField;
 
+/**
+ * `anchorIndex`/`headIndex` are optional to maintain API compatibility with old MQ.
+ */
+export type LooseLatexSelection = {
+  latex: string;
+  startIndex: number;
+  endIndex: number;
+  anchorIndex?: number;
+  headIndex?: number;
+};
+
+/**
+ * A selection is NOT uniquely defined by a `startIndex` and `endIndex`, even if
+ * you know which direction the selection is pointed, since the anchor can be
+ * in different places between the `startIndex` and `endIndex`.
+ *
+ * For example, in `ab\frac{123}{456}cd`, the user may click after the `5`, then drag
+ * to the right until after the `c`. That puts the `anchorIndex` after the `5`, and the
+ * `headIndex` and `endIndex` are after the `c`, but the `startIndex` is before the fraction.
+ * This can be visualized as `ab[\frac{123}{45!6}c>d`, where `[` is the start, `!` is the anchor,
+ * and `>` is both the head index and the end index.
+ *
+ * A selection is uniquely defined by an `anchorIndex` and `headIndex`, but it is not reasonable
+ * to recover the `startIndex` and `endIndex` directly from those. It is NOT true in general that
+ * `startIndex = min(anchorIndex, headIndex)` and `headIndex = max(anchorIndex, headIndex)`.
+ * That only holds true when the anchor and head are in the same group.
+ *
+ * In general, you need to use the parsed tree to determine the `startIndex` and `endIndex`.
+ * Rather than provide a separate API to convert `(anchor,head)` to `(start,end)`, the start
+ * and end indices are included in the exported selection.
+ */
 export type ExportedLatexSelection = {
   latex: string;
   startIndex: number;
   endIndex: number;
+  anchorIndex: number;
+  headIndex: number;
 };
 
 /** Class for public API methods and such. Mirrors the existing mathquill API. */
@@ -138,9 +171,9 @@ export class MqMathFieldApi {
     return mathspeak.replace(/ {2,}/g, ' ');
   }
 
-  selection(selection: ExportedLatexSelection): this;
+  selection(selection: LooseLatexSelection): this;
   selection(): ExportedLatexSelection;
-  selection(selection?: ExportedLatexSelection): ExportedLatexSelection | this {
+  selection(selection?: LooseLatexSelection): ExportedLatexSelection | this {
     if (selection) {
       this.focus();
       this.controller.dispatch({

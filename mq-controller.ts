@@ -26,17 +26,14 @@ import {
 } from './mq-nodes';
 import type { ExportedLatexSelection } from './mq-public-api';
 import { fixParents } from './node-traversal-order';
-import {
-  cursorToLatexIndex,
-  latexIndexToCursor,
-  printLatex,
-  printLatexRange
-} from './print-latex';
+import { latexIndexToCursor, printLatex, printLatexRange } from './print-latex';
 import type { MqSelection } from './selection';
 import {
+  exportSelection,
   isSelectionCollapsed,
   makeLeastCommonAncestorSelection,
   makePointSelection,
+  makeSameParentSelection,
   makeSelection,
   sliceMqTree,
   spliceMqTree
@@ -206,6 +203,7 @@ export class MqController {
             );
             this.model.selectionBeforeBlur = selection;
           }
+          // De-ghost all brackets in the field.
           while (true) {
             const bracket = this.model.root.find(
               (x) => x.type === 'brackets' && !!x.ghostSide
@@ -242,18 +240,27 @@ export class MqController {
         break;
       }
       case 'api-set-selection': {
-        const { startIndex, endIndex, latex } = action.selection;
+        const { startIndex, endIndex, anchorIndex, headIndex, latex } =
+          action.selection;
         if (printLatex(this.getRoot()) !== latex) {
           // Ignore selection updates that don't have the right latex; indices are messed up.
           return;
         }
-        if (startIndex > endIndex) {
-          return;
+        let anchor;
+        let head;
+        if (anchorIndex !== undefined && headIndex !== undefined) {
+          // If both anchor and head are provided, use them (and ignore start/end)
+          anchor = latexIndexToCursor(this.getRoot(), anchorIndex);
+          head = latexIndexToCursor(this.getRoot(), headIndex);
+        } else {
+          // Otherwise, use start and end (putting them as head and anchor,
+          // which feels backwards but matches old MQ).
+          if (startIndex > endIndex) {
+            return;
+          }
+          anchor = latexIndexToCursor(this.getRoot(), endIndex);
+          head = latexIndexToCursor(this.getRoot(), startIndex);
         }
-        // TODO-mq-rewrite-quirk: this seems backwards from what it should be (anchor on left, head on right).
-        // Leaving it be to match existing mathquill.
-        const anchor = latexIndexToCursor(this.getRoot(), endIndex);
-        const head = latexIndexToCursor(this.getRoot(), startIndex);
         if (anchor === undefined || head === undefined) {
           return;
         }
@@ -549,30 +556,17 @@ export class MqController {
 
   /** Returns the balanced selection, converted to latex indices. */
   getLatexSelection(): ExportedLatexSelection {
-    const { left, right } = this.getSelection();
-    return {
-      latex: this.getLatex(),
-      startIndex: cursorToLatexIndex(left),
-      endIndex: cursorToLatexIndex(right)
-    };
+    return exportSelection(this.getSelection());
   }
 
   domNodeToSpan(dom: Element): ExportedLatexSelection | undefined {
     const node = domNodeToMqNode(this.model, dom);
     if (!node) return undefined;
-    let left, right;
-
-    if (node.type === 'group') {
-      left = node.firstCursor();
-      right = node.lastCursor();
-    } else {
-      ({ left, right } = node.containingSelection());
-    }
-    return {
-      latex: this.getLatex(),
-      startIndex: cursorToLatexIndex(left),
-      endIndex: cursorToLatexIndex(right)
-    };
+    const selection =
+      node.type === 'group'
+        ? makeSameParentSelection(node, 0, node.children.length)
+        : node.containingSelection();
+    return exportSelection(selection);
   }
 
   debugGetCursorSelection(): MqSelection {

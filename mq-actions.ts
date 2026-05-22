@@ -1,6 +1,6 @@
 import type { LeftOrRight, UpOrDown } from './cursor';
 import type { MqConfig } from './mq-config';
-import type { ExportedLatexSelection } from './mq-public-api';
+import type { LooseLatexSelection } from './mq-public-api';
 
 export type ArrowAction =
   | {
@@ -63,7 +63,7 @@ export type MQAction =
   | { type: 'click-at'; target: Element | undefined; clientX: number }
   | { type: 'api-set-latex'; latex: string }
   | { type: 'api-clear-selection' }
-  | { type: 'api-set-selection'; selection: ExportedLatexSelection }
+  | { type: 'api-set-selection'; selection: LooseLatexSelection }
   | { type: 'set-aria-label'; label: string }
   | { type: 'set-aria-post-label'; label: string; timeout: number | undefined }
   | {
