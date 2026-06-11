@@ -3,14 +3,14 @@
  * overflow their width
  **********************************************/
 
-import { getCursorClientX } from './actions/move-up-down';
-import { animate } from './animate';
-import type { MqController } from './mq-controller';
+import { getCursorClientX } from './actions/move-up-down.ts';
+import { animate } from './animate.ts';
+import type { MqController } from './mq-controller.ts';
 import {
   isSelectionCollapsed,
   makePointSelection,
   type MqSelection
-} from './selection';
+} from './selection.ts';
 
 /**
  * Scroll the math field left or right to keep the head of the selection in view.
@@ -111,7 +111,11 @@ export function setOverflowClass(mqController: MqController) {
   const rootDom = root.getDomNode();
   if (!rootDom) return;
 
-  const overflowLeft = rootDom.scrollLeft > 0;
+  let overflowLeft = false;
+  if (mqController.getFocusState() === 'focused') {
+    // Measure only when focused. This is a DOM measurement and forces a full page layout.
+    overflowLeft = rootDom.scrollLeft > 0;
+  }
 
   rootDom.classList.toggle('dcg-mq-editing-overflow-left', overflowLeft);
 }

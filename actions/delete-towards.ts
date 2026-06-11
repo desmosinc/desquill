@@ -1,11 +1,11 @@
-import { Cursor, type LeftOrRight, swapDir } from '../cursor';
+import { Cursor, type LeftOrRight, swapDir } from '../cursor.ts';
 import {
   getAriaLabelForStartStyleCmd,
   getBareMathspeakForSelection,
   getMathspeakForBracketSide,
   summationMathspeakMap
-} from '../mq-mathspeak';
-import type { MqModel } from '../mq-model';
+} from '../mq-mathspeak.ts';
+import type { MqModel } from '../mq-model.ts';
 import {
   fracOrBinomPropName,
   isMqSymbol,
@@ -20,7 +20,7 @@ import {
   MqSupSub,
   sqrtPropName,
   supsubPropName
-} from '../mq-nodes';
+} from '../mq-nodes.ts';
 import {
   getSelectionSide,
   isSelectionCollapsed,
@@ -31,8 +31,8 @@ import {
   spliceMqTreeSeveral,
   spliceMqTreeSingle,
   unwrapBracket
-} from '../selection';
-import { canCloseOpposing, closeOpposing, OPP_BRACKS } from './type-bracket';
+} from '../selection.ts';
+import { canCloseOpposing, closeOpposing, OPP_BRACKS } from './type-bracket.ts';
 
 const replaceMapIfDeletingLeftward: Record<string, string> = {
   '\\le': '<',

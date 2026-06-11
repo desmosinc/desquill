@@ -1,9 +1,9 @@
-import type { Cursor } from '../cursor';
-import { parse } from '../mathquill-parser';
-import type { AutoCommandNames, TrieNode } from '../mq-config';
-import { doesMarkSetContainNode, findMarkContainingNode } from '../mq-marks';
-import { getMathspeakForBracketSide } from '../mq-mathspeak';
-import { type MqModel } from '../mq-model';
+import type { Cursor } from '../cursor.ts';
+import { parse } from '../mathquill-parser.ts';
+import type { AutoCommandNames, TrieNode } from '../mq-config.ts';
+import { doesMarkSetContainNode, findMarkContainingNode } from '../mq-marks.ts';
+import { getMathspeakForBracketSide } from '../mq-mathspeak.ts';
+import type { MqModel } from '../mq-model.ts';
 import {
   makeGroup,
   MqAns,
@@ -15,13 +15,13 @@ import {
   MqSqrt,
   MqSummation,
   MqSupSub
-} from '../mq-nodes';
+} from '../mq-nodes.ts';
 import {
   isMqVariable,
   mapCtrlSeqAlias,
   mapSymbolToLatex
-} from '../parser/cmd-to-latex';
-import { getFragmentReplacement } from '../parser/cmds';
+} from '../parser/cmd-to-latex.ts';
+import { getFragmentReplacement } from '../parser/cmds.ts';
 import {
   isSelectionCollapsed,
   makePointSelection,
@@ -29,10 +29,10 @@ import {
   type MqSelection,
   spliceMqTree,
   spliceMqTreeSingle
-} from '../selection';
-import { typeBracket } from './type-bracket';
-import { typeFractionSlash } from './type-fraction-slash';
-import { typeSupSub } from './type-sup-sub';
+} from '../selection.ts';
+import { typeBracket } from './type-bracket.ts';
+import { typeFractionSlash } from './type-fraction-slash.ts';
+import { typeSupSub } from './type-sup-sub.ts';
 
 /**
  * Replace the selection with the given node, put the cursor after,

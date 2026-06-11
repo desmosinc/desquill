@@ -1,9 +1,9 @@
-import {
-  type DictionaryKey,
-  type KeysWithNoVariables,
-  type KeyToVariables
-} from './dictionary-types-generated';
-import type { LocalizableNumericValue } from './i18n/localizable-numeric-value';
+import type {
+  DictionaryKey,
+  KeysWithNoVariables,
+  KeyToVariables
+} from './dictionary-types-generated.ts';
+import type { LocalizableNumericValue } from './i18n/localizable-numeric-value.ts';
 
 export interface PackedTranslation {
   key: DictionaryKey;
@@ -43,4 +43,4 @@ export function bindLanguageToLookup(
   return s;
 }
 
-export { DictionaryKey };
+export type { DictionaryKey };

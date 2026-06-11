@@ -1,7 +1,7 @@
-import { type LeftOrRight, swapDir, type UpOrDown } from '../cursor';
-import type { MqModel } from '../mq-model';
-import type { MqGroup, MqNonGroup } from '../mq-nodes';
-import { makeSelection, type MqSelection } from '../selection';
+import { type LeftOrRight, swapDir, type UpOrDown } from '../cursor.ts';
+import type { MqModel } from '../mq-model.ts';
+import type { MqGroup, MqNonGroup } from '../mq-nodes.ts';
+import { makeSelection, type MqSelection } from '../selection.ts';
 
 /** Arrow key left/right with shift held, and ctrl not held. */
 export function selectLeftRight(model: MqModel, dir: LeftOrRight): MqSelection {

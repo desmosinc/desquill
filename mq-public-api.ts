@@ -6,16 +6,16 @@ import {
   type UnprocessedMqConfig,
   updateConfig,
   updateDefaultMqConfig
-} from './mq-config';
-import { MqController } from './mq-controller';
-import { getMathspeak } from './mq-mathspeak';
-import type { MqGroup } from './mq-nodes';
-import { MqView } from './mq-view';
-import { type KeyboardEventsController } from './sane-keyboard-events';
-import type { MqSelection } from './selection';
-import { isEqual } from './vendor/underscore';
+} from './mq-config.ts';
+import { MqController } from './mq-controller.ts';
+import { getMathspeak } from './mq-mathspeak.ts';
+import type { MqGroup } from './mq-nodes.ts';
+import { MqView } from './mq-view.ts';
+import type { KeyboardEventsController } from './sane-keyboard-events.ts';
+import type { MqSelection } from './selection.ts';
+import { isEqual } from './vendor/underscore.js';
 
-export { bundledLocalize, bundledSupportedLanguages } from './i18n/mq-i18n';
+export { bundledLocalize, bundledSupportedLanguages } from './i18n/mq-i18n.ts';
 
 export function getApiInstanceForElement(
   elm: HTMLElement

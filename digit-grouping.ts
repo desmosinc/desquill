@@ -1,5 +1,5 @@
-import type { MQRenderContext } from './mathquill-renderer';
-import type { MqNode } from './mq-nodes';
+import type { MQRenderContext } from './mathquill-renderer.ts';
+import type { MqNode } from './mq-nodes.ts';
 
 function isDigitGroupingChar(node: MqNode | undefined) {
   return node?.type === 'char' && /^(\\ )|[0-9.]$/.test(node.latex);

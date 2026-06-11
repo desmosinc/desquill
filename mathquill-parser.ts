@@ -2,8 +2,8 @@ import type {
   AutoOperatorNames,
   MqConfig,
   MqMutableMarksConfig
-} from './mq-config';
-import { updateOperatorNameMarks } from './mq-marks';
+} from './mq-config.ts';
+import { updateOperatorNameMarks } from './mq-marks.ts';
 import {
   makeGroup,
   MqAns,
@@ -19,11 +19,11 @@ import {
   MqSummation,
   MqSupSub,
   MqToken
-} from './mq-nodes';
-import type { ExportedLatexSelection } from './mq-public-api';
-import { mapSymbolToLatex } from './parser/cmd-to-latex';
-import { type MQBlock, parse as parseLatex } from './parser/parser';
-import { isStyleCmdVal } from './style-commands';
+} from './mq-nodes.ts';
+import type { ExportedLatexSelection } from './mq-public-api.ts';
+import { mapSymbolToLatex } from './parser/cmd-to-latex.ts';
+import { type MQBlock, parse as parseLatex } from './parser/parser.ts';
+import { isStyleCmdVal } from './style-commands.ts';
 
 type Context = {
   autoOperatorNames: AutoOperatorNames;

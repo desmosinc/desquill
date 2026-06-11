@@ -1,6 +1,6 @@
-import type { LeftOrRight, UpOrDown } from './cursor';
-import type { MqConfig } from './mq-config';
-import type { LooseLatexSelection } from './mq-public-api';
+import type { LeftOrRight, UpOrDown } from './cursor.ts';
+import type { MqConfig } from './mq-config.ts';
+import type { LooseLatexSelection } from './mq-public-api.ts';
 
 export type ArrowAction =
   | {

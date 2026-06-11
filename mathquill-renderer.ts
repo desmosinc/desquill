@@ -1,42 +1,46 @@
-import { shouldDisplayAsBinaryOperator } from './binary-operators';
-import { computeDigitGroupingClasses } from './digit-grouping';
-import { affectsRenderProps, type MqRenderConfig } from './mq-config';
-import type { FocusState } from './mq-controller';
+import { shouldDisplayAsBinaryOperator } from './binary-operators.ts';
+import { computeDigitGroupingClasses } from './digit-grouping.ts';
+import { affectsRenderProps, type MqRenderConfig } from './mq-config.ts';
+import type { FocusState } from './mq-controller.ts';
 import {
   doesMarkEndAtNode,
   doesMarkSetContainNode,
   doesMarkStartAtNode
-} from './mq-marks';
-import type { MqModel } from './mq-model';
-import {
-  type GroupMarks,
-  type MqBinom,
-  type MqBrackets,
-  type MqFrac,
-  type MqGroup,
-  type MqNode,
-  type MqSqrt,
-  type MqStyleCmd,
-  type MqSummation,
-  type MqSupSub,
-  type MqToken
-} from './mq-nodes';
-import { isSelectionCollapsed, type MqSelection } from './selection';
-import { createStyleContainerNode } from './style-commands';
+} from './mq-marks.ts';
+import type { MqModel } from './mq-model.ts';
+import type {
+  GroupMarks,
+  MqBinom,
+  MqBrackets,
+  MqFrac,
+  MqGroup,
+  MqNode,
+  MqSqrt,
+  MqStyleCmd,
+  MqSummation,
+  MqSupSub,
+  MqToken
+} from './mq-nodes.ts';
+import { isSelectionCollapsed, type MqSelection } from './selection.ts';
+import { createStyleContainerNode } from './style-commands.ts';
 import {
   mapSymbolToClassName,
   mapSymbolToDOMTag,
   mapSymbolToStyle,
   mapSymbolToText,
   stringReplace
-} from './symbol-render-table';
-import { isEqual, pick } from './vendor/underscore';
+} from './symbol-render-table.ts';
+import { isEqual, pick } from './vendor/underscore.js';
 
 export type MQRenderContext = {
   config: MqRenderConfig;
   digitGroupingMap: Map<MqNode, string | undefined>;
   /** Depth including the fraction itself. */
   mathspeakFracDepth: number;
+  /** Tokens from the previous render. */
+  previousTokenNodes: ReadonlyMap<MqNode, HTMLElement>;
+  /** Tokens from the current render. */
+  currentTokenNodes: Map<MqNode, HTMLElement>;
 };
 
 type SVGSymbol = {
@@ -506,14 +510,21 @@ function renderSummation(
 }
 
 export function renderToken(
-  _ctx: MQRenderContext,
+  ctx: MQRenderContext,
   parent: HTMLElement,
   token: MqToken
 ) {
+  const existing = ctx.previousTokenNodes.get(token);
+  if (existing) {
+    parent.appendChild(existing);
+    ctx.currentTokenNodes.set(token, existing);
+    return existing;
+  }
   const node = createNode(parent, 'span', '', {
     className: 'dcg-mq-ignore-mousedown dcg-mq-token'
   });
   node.setAttribute('data-dcg-mq-token', token.id);
+  ctx.currentTokenNodes.set(token, node);
   return node;
 }
 
@@ -630,6 +641,7 @@ function insertSelection(
 export class MqRenderer {
   container: HTMLElement;
   lastConfig: MqRenderConfig | undefined;
+  previousTokenNodes: ReadonlyMap<MqNode, HTMLElement> | undefined;
   unSelect: (() => void) | undefined;
 
   constructor(container: HTMLElement) {
@@ -653,15 +665,29 @@ export class MqRenderer {
 
   private renderFromScratch(model: MqModel, config: MqRenderConfig) {
     const { root } = model;
+
+    // If focus is inside a token (or anywhere else under `container`), the
+    // upcoming `innerHTML = ''` will detach it and the browser will blur it.
+    // We swallow the corresponding focus events at capture phase so observers
+    // don't see a focus change, then re-focus the element after the render
+    // (it will be reattached as long as its containing token is reused).
+    const { unsuppressBlurs } = suppressBlurs(this.container);
+
     // Render from scratch with no selection
     this.container.innerHTML = '';
     const ctx: MQRenderContext = {
       config,
       digitGroupingMap: new Map(),
-      mathspeakFracDepth: 0
+      mathspeakFracDepth: 0,
+      previousTokenNodes: this.previousTokenNodes ?? new Map(),
+      currentTokenNodes: new Map()
     };
 
     renderGroup(ctx, root, this.container);
+
+    this.previousTokenNodes = ctx.currentTokenNodes;
+
+    unsuppressBlurs();
   }
 
   private insertSelection(model: MqModel, focusState: FocusState) {
@@ -700,4 +726,32 @@ function shouldOmitPadding(node: MqNode | undefined) {
   if (node.type === 'summation') return true;
 
   return false;
+}
+
+/** Suppress all blur events. Call `unsuppressBlurs` to cancel. */
+function suppressBlurs(container: HTMLElement) {
+  const previouslyFocused =
+    document.activeElement instanceof HTMLElement &&
+    container.contains(document.activeElement)
+      ? document.activeElement
+      : null;
+  const stopEvent = (e: Event) => e.stopImmediatePropagation();
+  const focusEvents = ['blur', 'focusout', 'focus', 'focusin'] as const;
+  if (previouslyFocused) {
+    for (const evt of focusEvents) {
+      document.addEventListener(evt, stopEvent, true);
+    }
+  }
+
+  function unsuppressBlurs() {
+    if (previouslyFocused) {
+      if (previouslyFocused.isConnected) {
+        previouslyFocused.focus();
+      }
+      for (const evt of focusEvents) {
+        document.removeEventListener(evt, stopEvent, true);
+      }
+    }
+  }
+  return { unsuppressBlurs };
 }

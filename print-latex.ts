@@ -1,8 +1,8 @@
-import { type Cursor } from './cursor';
-import { BuiltInOpNames } from './mq-config';
-import { doesMarkEndAtNode, doesMarkStartAtNode } from './mq-marks';
-import { type MqGroup, type MqNode } from './mq-nodes';
-import { allCursorsInOrder } from './node-traversal-order';
+import type { Cursor } from './cursor.ts';
+import { BuiltInOpNames } from './mq-config.ts';
+import { doesMarkEndAtNode, doesMarkStartAtNode } from './mq-marks.ts';
+import type { MqGroup, MqNode } from './mq-nodes.ts';
+import { allCursorsInOrder } from './node-traversal-order.ts';
 
 type PrintLatexOpts = {
   emitCursorAtEveryPosition?: boolean;

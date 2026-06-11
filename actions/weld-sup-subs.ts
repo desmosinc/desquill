@@ -1,8 +1,8 @@
-import { type MqModel } from '../mq-model';
-import { concatGroups, type MqGroup, MqSupSub } from '../mq-nodes';
-import { allGroupsInOrder } from '../node-traversal-order';
-import { makeSameParentSelection } from '../selection';
-import { someCursorSatisfies } from '../stash-cursors';
+import type { MqModel } from '../mq-model.ts';
+import { concatGroups, type MqGroup, MqSupSub } from '../mq-nodes.ts';
+import { allGroupsInOrder } from '../node-traversal-order.ts';
+import { makeSameParentSelection } from '../selection.ts';
+import { someCursorSatisfies } from '../stash-cursors.ts';
 
 /** Weld together consecutive SupSubs, unless the cursor is between the SupSubs. */
 export function weldSupSubs(model: MqModel): MqModel {

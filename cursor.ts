@@ -1,4 +1,4 @@
-import type { MqGroup, MqNonGroup } from './mq-nodes';
+import type { MqGroup, MqNonGroup } from './mq-nodes.ts';
 
 export type LeftOrRight = 'left' | 'right';
 

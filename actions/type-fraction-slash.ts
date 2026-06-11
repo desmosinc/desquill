@@ -1,14 +1,14 @@
-import { nodeEndsBinaryOperator } from '../binary-operators';
-import type { Cursor } from '../cursor';
-import { doesMarkSetContainNode } from '../mq-marks';
-import type { MqModel } from '../mq-model';
+import { nodeEndsBinaryOperator } from '../binary-operators.ts';
+import type { Cursor } from '../cursor.ts';
+import { doesMarkSetContainNode } from '../mq-marks.ts';
+import type { MqModel } from '../mq-model.ts';
 import {
   makeGroup,
   MqBinom,
   MqFrac,
   type MqGroup,
   type MqNode
-} from '../mq-nodes';
+} from '../mq-nodes.ts';
 import {
   isSelectionCollapsed,
   makePointSelection,
@@ -16,7 +16,7 @@ import {
   removeGhostsFromSelection,
   sliceMqTree,
   spliceMqTreeSingle
-} from '../selection';
+} from '../selection.ts';
 
 export type FractionMode = 'frac' | 'binom';
 

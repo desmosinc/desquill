@@ -1,15 +1,15 @@
-import { Cursor, type LeftOrRight } from './cursor';
-import type { MqModel } from './mq-model';
+import { Cursor, type LeftOrRight } from './cursor.ts';
+import type { MqModel } from './mq-model.ts';
 import {
   makeGroup,
   type MqBrackets,
   mqBracketWithGhostSide,
   type MqGroup,
   type MqNode
-} from './mq-nodes';
-import type { ExportedLatexSelection } from './mq-public-api';
-import { cursorToLatexIndex, printLatex } from './print-latex';
-import { copyCursorIndices } from './stash-cursors';
+} from './mq-nodes.ts';
+import type { ExportedLatexSelection } from './mq-public-api.ts';
+import { cursorToLatexIndex, printLatex } from './print-latex.ts';
+import { copyCursorIndices } from './stash-cursors.ts';
 
 /**
  * Invariants (checked in `makeSelection`)

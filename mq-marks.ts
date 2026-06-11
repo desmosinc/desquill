@@ -2,8 +2,8 @@ import type {
   AutoOperatorNames,
   MqMutableMarksConfig,
   TrieNode
-} from './mq-config';
-import type { MqGroup, MqNode } from './mq-nodes';
+} from './mq-config.ts';
+import type { MqGroup, MqNode } from './mq-nodes.ts';
 
 /**
  * The indices range from 0 to children.length.

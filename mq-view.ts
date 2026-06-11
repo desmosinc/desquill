@@ -1,13 +1,13 @@
 import { v4 as uuid } from '@lukeed/uuid/secure';
 
-import { MqRenderer } from './mathquill-renderer';
-import type { MqController } from './mq-controller';
-import { computeFinalMathspeak, getMathspeak } from './mq-mathspeak';
+import { MqRenderer } from './mathquill-renderer.ts';
+import type { MqController } from './mq-controller.ts';
+import { computeFinalMathspeak, getMathspeak } from './mq-mathspeak.ts';
 import {
   type KeyboardEventsController,
   saneKeyboardEvents
-} from './sane-keyboard-events';
-import { scrollHoriz, setOverflowClass } from './scroll-horiz';
+} from './sane-keyboard-events.ts';
+import { scrollHoriz, setOverflowClass } from './scroll-horiz.ts';
 
 export class MqView {
   private rootElt: HTMLElement;

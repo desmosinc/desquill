@@ -1,5 +1,5 @@
-import type { MqModel } from '../mq-model';
-import { makeGroup, type MqNode, MqSupSub } from '../mq-nodes';
+import type { MqModel } from '../mq-model.ts';
+import { makeGroup, type MqNode, MqSupSub } from '../mq-nodes.ts';
 import {
   isSelectionCollapsed,
   makePointSelection,
@@ -7,7 +7,7 @@ import {
   sliceMqTree,
   spliceMqTree,
   spliceMqTreeSingle
-} from '../selection';
+} from '../selection.ts';
 
 export function typeSupSub(model: MqModel, supsub: 'sup' | 'sub'): MqModel {
   // Put the entire selection (if any) in a superscript,

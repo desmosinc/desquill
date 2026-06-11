@@ -1,6 +1,6 @@
-import { type Cursor, type LeftOrRight, swapDir } from '../cursor';
-import type { MqConfig } from '../mq-config';
-import type { MqModel } from '../mq-model';
+import { type Cursor, type LeftOrRight, swapDir } from '../cursor.ts';
+import type { MqConfig } from '../mq-config.ts';
+import type { MqModel } from '../mq-model.ts';
 import {
   makeGroup,
   mqBracketLatex,
@@ -9,7 +9,7 @@ import {
   mqBracketWithMiddle,
   mqBracketWithSymbol,
   type MqGroup
-} from '../mq-nodes';
+} from '../mq-nodes.ts';
 import {
   getSelectionSide,
   isSelectionCollapsed,
@@ -18,7 +18,7 @@ import {
   sliceMqTree,
   spliceMqTree,
   spliceMqTreeSingle
-} from '../selection';
+} from '../selection.ts';
 
 // This mapping works for both symbol and latex.
 export const OPP_BRACKS: { [key in string]?: string } = {

@@ -1,7 +1,7 @@
-import { type AutoOperatorNames } from '../mq-config';
-import type { StyleCmdVal } from '../style-commands';
-import { mapCtrlSeqAlias } from './cmd-to-latex';
-import { getFragmentReplacement, getParserForCmd } from './cmds';
+import type { AutoOperatorNames } from '../mq-config.ts';
+import type { StyleCmdVal } from '../style-commands.ts';
+import { mapCtrlSeqAlias } from './cmd-to-latex.ts';
+import { getFragmentReplacement, getParserForCmd } from './cmds.ts';
 
 type MQFragment = MQNode[];
 

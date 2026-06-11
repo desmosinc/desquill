@@ -1,5 +1,5 @@
-import { createNode } from './mathquill-renderer';
-import type { MqNode, MqStyleCmd } from './mq-nodes';
+import { createNode } from './mathquill-renderer.ts';
+import type { MqNode, MqStyleCmd } from './mq-nodes.ts';
 
 const ArrowText = '\u27A4';
 const U_DOT_ABOVE = '\u02D9';

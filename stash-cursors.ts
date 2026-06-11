@@ -1,10 +1,10 @@
-import { Cursor } from './cursor';
-import type { MqGroup } from './mq-nodes';
-import { allGroupsInOrder } from './node-traversal-order';
+import { Cursor } from './cursor.ts';
+import type { MqGroup } from './mq-nodes.ts';
+import { allGroupsInOrder } from './node-traversal-order.ts';
 import {
   makeLeastCommonAncestorSelection,
   type MqSelection
-} from './selection';
+} from './selection.ts';
 
 export type StashedCursorKey = 'head' | 'anchor' | 'upDown';
 

@@ -3,7 +3,7 @@ import * as FluentBundle from '@fluent/bundle';
 import {
   isLocalizableNumericValue,
   type LocalizableNumericValue
-} from './localizable-numeric-value';
+} from './localizable-numeric-value.ts';
 
 // From https://github.com/shadiabuhilal/rtl-detect/blob/2eed8a33276461a24e7033d1d3a115ee64aee3f5/lib/rtl-detect.js
 const RTL_LANGUAGES = [
@@ -36,10 +36,16 @@ export type FluentBundleSequenceOptions = {
  * Interface to an sequence of Fluent bundles, in order of language preference.
  */
 export class FluentBundleSequence<TranslatedString extends string> {
+  declare private bundles: FluentBundle.FluentBundle[];
+  declare private onError: (err: string | Error) => void;
+
   constructor(
-    private bundles: FluentBundle.FluentBundle[],
-    private onError: (err: string | Error) => void
-  ) {}
+    bundles: FluentBundle.FluentBundle[],
+    onError: (err: string | Error) => void
+  ) {
+    this.bundles = bundles;
+    this.onError = onError;
+  }
 
   /**
    * Create a `FluentBundleSequence` from raw .ftl sources.

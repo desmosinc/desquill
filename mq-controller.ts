@@ -1,33 +1,37 @@
-import { ctrlDeleteInDir, deleteInDir } from './actions/delete-towards';
-import { moveLeftRight, moveOutOf } from './actions/move-left-right';
-import { moveUpDown } from './actions/move-up-down';
-import { domNodeToMqNode, seekCursorInTarget } from './actions/seek-cursor';
+import { ctrlDeleteInDir, deleteInDir } from './actions/delete-towards.ts';
+import { moveLeftRight, moveOutOf } from './actions/move-left-right.ts';
+import { moveUpDown } from './actions/move-up-down.ts';
+import { domNodeToMqNode, seekCursorInTarget } from './actions/seek-cursor.ts';
 import {
   selectAll,
   selectCtrlHomeEnd,
   selectHomeEnd,
   selectLeftRight,
   selectUpDown
-} from './actions/select-left-right';
-import { typeChar } from './actions/type-char';
-import { weldSupSubs } from './actions/weld-sup-subs';
-import { parse } from './mathquill-parser';
-import { actionAllowedForStatic, type MQAction } from './mq-actions';
+} from './actions/select-left-right.ts';
+import { typeChar } from './actions/type-char.ts';
+import { weldSupSubs } from './actions/weld-sup-subs.ts';
+import { parse } from './mathquill-parser.ts';
+import { actionAllowedForStatic, type MQAction } from './mq-actions.ts';
 import {
   computeFinalMathspeak,
   getMathspeak,
   getMathspeakForSelection
-} from './mq-mathspeak';
-import { MqModel } from './mq-model';
+} from './mq-mathspeak.ts';
+import { MqModel } from './mq-model.ts';
 import {
   calculateTreeDepth,
   mqBracketWithGhostSide,
   type MqGroup
-} from './mq-nodes';
-import type { ExportedLatexSelection } from './mq-public-api';
-import { fixParents } from './node-traversal-order';
-import { latexIndexToCursor, printLatex, printLatexRange } from './print-latex';
-import type { MqSelection } from './selection';
+} from './mq-nodes.ts';
+import type { ExportedLatexSelection } from './mq-public-api.ts';
+import { fixParents } from './node-traversal-order.ts';
+import {
+  latexIndexToCursor,
+  printLatex,
+  printLatexRange
+} from './print-latex.ts';
+import type { MqSelection } from './selection.ts';
 import {
   exportSelection,
   isSelectionCollapsed,
@@ -37,9 +41,9 @@ import {
   makeSelection,
   sliceMqTree,
   spliceMqTree
-} from './selection';
-import { clearStashedUpdownCursors } from './stash-cursors';
-import { Dispatcher } from './vendor/flux';
+} from './selection.ts';
+import { clearStashedUpdownCursors } from './stash-cursors.ts';
+import { Dispatcher } from './vendor/flux.ts';
 
 export type FocusState = 'blurred' | 'unintentional-blurred' | 'focused';
 

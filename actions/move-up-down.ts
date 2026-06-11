@@ -4,15 +4,11 @@ import {
   swapDir,
   swapUpdown,
   type UpOrDown
-} from '../cursor';
-import type { MqModel } from '../mq-model';
-import {
-  type MqGroup,
-  type MqInteriorNode,
-  type MqNonGroup
-} from '../mq-nodes';
-import { addCursorIndex } from '../stash-cursors';
-import { seekGroup } from './seek-cursor';
+} from '../cursor.ts';
+import type { MqModel } from '../mq-model.ts';
+import type { MqGroup, MqInteriorNode, MqNonGroup } from '../mq-nodes.ts';
+import { addCursorIndex } from '../stash-cursors.ts';
+import { seekGroup } from './seek-cursor.ts';
 
 export function moveUpDown(model: MqModel, updown: UpOrDown): MqModel {
   const selection = model.selection;

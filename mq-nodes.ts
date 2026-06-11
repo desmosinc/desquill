@@ -1,9 +1,9 @@
-import { Cursor, type LeftOrRight } from './cursor';
-import { computeEllipsisMarks, type MarkSet } from './mq-marks';
-import { printLatex } from './print-latex';
-import { makeSameParentSelection } from './selection';
-import { copyCursorIndices, type StashedCursorKey } from './stash-cursors';
-import type { StyleCmdVal } from './style-commands';
+import { Cursor, type LeftOrRight } from './cursor.ts';
+import { computeEllipsisMarks, type MarkSet } from './mq-marks.ts';
+import { printLatex } from './print-latex.ts';
+import { makeSameParentSelection } from './selection.ts';
+import { copyCursorIndices, type StashedCursorKey } from './stash-cursors.ts';
+import type { StyleCmdVal } from './style-commands.ts';
 
 abstract class MqNodeBase {
   // Prevent assignment from a plain object.

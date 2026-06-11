@@ -1,11 +1,11 @@
-import { Cursor } from './cursor';
+import { Cursor } from './cursor.ts';
 import {
   type MqGroup,
   type MqInteriorNode,
   type MqNode,
   nthChild,
   numChildren
-} from './mq-nodes';
+} from './mq-nodes.ts';
 
 /**
  * Traverse through all cursors in latex order.

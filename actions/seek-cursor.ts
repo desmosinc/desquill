@@ -1,6 +1,6 @@
-import type { Cursor, LeftOrRight } from '../cursor';
-import type { MqModel } from '../mq-model';
-import { type MqGroup, type MqNode, type MqNonGroup } from '../mq-nodes';
+import type { Cursor, LeftOrRight } from '../cursor.ts';
+import type { MqModel } from '../mq-model.ts';
+import type { MqGroup, MqNode, MqNonGroup } from '../mq-nodes.ts';
 
 /**
  * Return the closest cursor to the x-coordinate `clientX` in the `group`.

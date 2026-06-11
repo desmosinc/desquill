@@ -3,12 +3,16 @@ import en from 'text!../l10n/en.ftl';
 import type {
   DictionaryKey,
   KeysWithNoVariables
-} from '../dictionary-types-generated';
-import type { KeysWithVariables, Variables, Vars } from '../mq-i18n-interface';
+} from '../dictionary-types-generated.ts';
+import type {
+  KeysWithVariables,
+  Variables,
+  Vars
+} from '../mq-i18n-interface.ts';
 import {
   FluentBundleSequence,
   type FluentBundleSequenceOptions
-} from './fluent-bundle-sequence';
+} from './fluent-bundle-sequence.ts';
 
 const ftlSources: Record<string, string | undefined> = { en };
 

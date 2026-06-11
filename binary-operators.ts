@@ -1,5 +1,5 @@
-import { doesMarkEndAtNode } from './mq-marks';
-import type { MqChar, MqGroup, MqNode, MqStyleCmd } from './mq-nodes';
+import { doesMarkEndAtNode } from './mq-marks.ts';
+import type { MqChar, MqGroup, MqNode, MqStyleCmd } from './mq-nodes.ts';
 
 const disallowNextBinaryOperator: { [key: string]: true | undefined } = {
   ',': true,

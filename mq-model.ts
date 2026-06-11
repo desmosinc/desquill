@@ -1,37 +1,37 @@
-import type { Cursor, LeftOrRight } from './cursor';
-import { updateMutableMarksOnGroup } from './mathquill-parser';
+import type { Cursor, LeftOrRight } from './cursor.ts';
+import { updateMutableMarksOnGroup } from './mathquill-parser.ts';
 import {
   getDefaultMqConfig,
   type MqConfig,
   mutableMarksProps
-} from './mq-config';
+} from './mq-config.ts';
 import {
   bindLanguageToLookup,
   type LookupWithLanguageBinding
-} from './mq-i18n-interface';
+} from './mq-i18n-interface.ts';
 import {
   ariaLabelOfNthChild,
   getMathspeak,
   type MathspeakOptions
-} from './mq-mathspeak';
+} from './mq-mathspeak.ts';
 import {
   clearDerivedStateOnGroup,
   makeGroup,
   type MqGroup,
   type MqNode
-} from './mq-nodes';
-import { allGroupsInOrder } from './node-traversal-order';
+} from './mq-nodes.ts';
+import { allGroupsInOrder } from './node-traversal-order.ts';
 import {
   makePointSelection,
   type MqSelection,
   spliceMqTree
-} from './selection';
+} from './selection.ts';
 import {
   clearStashedSelectionCursors,
   stashSelectionCursors,
   unstashSelectionCursors
-} from './stash-cursors';
-import { isEqual, pick } from './vendor/underscore';
+} from './stash-cursors.ts';
+import { isEqual, pick } from './vendor/underscore.js';
 
 export class MqModel {
   readonly root: MqGroup;

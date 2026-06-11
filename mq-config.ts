@@ -1,7 +1,7 @@
-import { isSpecialCommand } from './actions/type-char';
-import { entries } from './lib';
-import type { LocalizeFunction } from './mq-i18n-interface';
-import { cmdToLatex, mapCtrlSeqAlias } from './parser/cmd-to-latex';
+import { isSpecialCommand } from './actions/type-char.ts';
+import { entries } from './lib.ts';
+import type { LocalizeFunction } from './mq-i18n-interface.ts';
+import { cmdToLatex, mapCtrlSeqAlias } from './parser/cmd-to-latex.ts';
 
 export type MqConfig = MqPassthroughConfig & MqPostParsedConfig;
 

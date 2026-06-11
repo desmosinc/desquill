@@ -1,4 +1,4 @@
-import type { MqChar, MqNode } from '../mq-nodes';
+import type { MqChar, MqNode } from '../mq-nodes.ts';
 
 export const cmdToLatex: Record<string, string> = {
   ' ': '\\ ',

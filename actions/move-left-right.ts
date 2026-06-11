@@ -1,8 +1,8 @@
-import { type Cursor, type LeftOrRight, swapDir } from '../cursor';
-import type { MqModel } from '../mq-model';
-import { isLeaf, type MqGroup, type MqNonGroup } from '../mq-nodes';
-import { getSelectionSide, isSelectionCollapsed } from '../selection';
-import { downInto, upInto } from './move-up-down';
+import { type Cursor, type LeftOrRight, swapDir } from '../cursor.ts';
+import type { MqModel } from '../mq-model.ts';
+import { isLeaf, type MqGroup, type MqNonGroup } from '../mq-nodes.ts';
+import { getSelectionSide, isSelectionCollapsed } from '../selection.ts';
+import { downInto, upInto } from './move-up-down.ts';
 
 /** Arrow key left/right without shift/ctrl held. */
 export function moveLeftRight(model: MqModel, dir: LeftOrRight): MqModel {

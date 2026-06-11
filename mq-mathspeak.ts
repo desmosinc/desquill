@@ -1,10 +1,10 @@
-import { shouldDisplayAsBinaryOperator } from './binary-operators';
-import type { LeftOrRight } from './cursor';
-import type { KeysWithNoVariables } from './dictionary-types-generated';
-import { localizableNumericValue } from './i18n/localizable-numeric-value';
-import type { AutoOperatorNames } from './mq-config';
-import { type LookupWithLanguageBinding } from './mq-i18n-interface';
-import { doesMarkEndAtNode, doesMarkStartAtNode } from './mq-marks';
+import { shouldDisplayAsBinaryOperator } from './binary-operators.ts';
+import type { LeftOrRight } from './cursor.ts';
+import type { KeysWithNoVariables } from './dictionary-types-generated.ts';
+import { localizableNumericValue } from './i18n/localizable-numeric-value.ts';
+import type { AutoOperatorNames } from './mq-config.ts';
+import type { LookupWithLanguageBinding } from './mq-i18n-interface.ts';
+import { doesMarkEndAtNode, doesMarkStartAtNode } from './mq-marks.ts';
 import {
   fracOrBinomPropName,
   type MqBrackets,
@@ -19,9 +19,9 @@ import {
   type MqSupSub,
   sqrtPropName,
   supsubPropName
-} from './mq-nodes';
-import { isSelectionCollapsed, type MqSelection } from './selection';
-import { isTextBlock } from './style-commands';
+} from './mq-nodes.ts';
+import { isSelectionCollapsed, type MqSelection } from './selection.ts';
+import { isTextBlock } from './style-commands.ts';
 
 export interface MathspeakOptions {
   readonly ignoreShorthand: boolean;
