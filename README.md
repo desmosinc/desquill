@@ -1,12 +1,14 @@
-# MathQuill
+# DesQuill
 
-MathQuill is a web formula editor designed to make typing math easy and beautiful.
+Welcome to DesQuill! This is Desmos's internal fork of [MathQuill](http://mathquill.com/), a web formula editor designed to make typing math easy and beautiful.
 
-This is Desmos's internal fork, made source-available in [accordance with the MPL](#open-source-license). Development is not performed on this repository, and we are not accepting pull requests or issues on this repository. For suggestions regarding MathQuill in Desmos, email <feedback@desmos.com>.
+Our goal with this fork was to make a compatible drop-in replacement for MathQuill that would be easier for us to maintain and expand. This fork has been extensively tested for consistency with MathQuill's APIs and LaTeX rendering, but it may diverge over time.
+
+Although this is intended for internal use, and we aren't accepting external Pull Requests or Issues on this repository, we welcome your feedback at <feedback@desmos.com>. Everything in this repository is available under the [MPL 2.0 License](#open-source-license), and we hope that our changes might be useful in your projects as well.
 
 ## Getting Started
 
-MathQuill has a simple interface. This brief example creates a MathQuill element and renders, then reads a given input:
+DesQuill inherits the simple interface of MathQuill. This brief example creates an editable MathField and renders, then reads, a given input:
 
 ```javascript
 import * as MQ from './mq-public-api';
@@ -21,23 +23,29 @@ mq.latex('2^{\\frac{3}{2}}'); // Renders the given LaTeX in the MathQuill field
 mq.latex(); // => '2^{\\frac{3}{2}}'
 ```
 
-Check out our [Getting Started Guide](http://docs.mathquill.com/en/latest/Getting_Started/) for setup instructions and basic MathQuill usage.
-
 ## Docs
 
 The API Methods are documented at [docs/Api_Methods.md](docs/Api_Methods.md).
 
 Some config options are documented at [docs/Config.md](docs/Config.md).
 
+## How DesQuill differs from MathQuill
+
+DesQuill keeps MathQuill's public API, but the core is rewritten from scratch with a few goals:
+
+- Unidirectional model/view architecture
+- Centralized handling of actions through a single dispatcher (see `mq-actions.ts`)
+- No reliance on jQuery fragments
+- Synchronous rendering from state
+- Localization for Mathspeak and ARIA output, backed by Fluent
+
+API-visible differences are cataloged in [docs/Differences.md](docs/Differences.md).
+
 ## History
 
-Mathquill was originally by [Han](http://github.com/laughinghan), [Jeanine](http://github.com/jneen), and [Mary](http://github.com/stufflebear) (<maintainers@mathquill.com>). It was hosted at https://github.com/mathquill/mathquill. This rewrite, by the team at [Desmos](https://www.desmos.com/) is based on our fork at https://github.com/desmosinc/mathquill but rewrote nearly all of the code. Significant API differences are documented at [docs/Differences.md](docs/Differences.md).
+MathQuill was originally by [Han](http://github.com/laughinghan), [Jeanine](http://github.com/jneen), and [Mary](http://github.com/stufflebear) (<maintainers@mathquill.com>). It is hosted at https://github.com/mathquill/mathquill. This rewrite, by the team at [Desmos](https://www.desmos.com/), is based on our fork at https://github.com/desmosinc/mathquill, which is no longer being maintained.
 
 ## Open-Source License
 
-The Source Code Form of MathQuill is subject to the terms of the Mozilla Public
+The Source Code Form of DesQuill is subject to the terms of the Mozilla Public
 License, v. 2.0: [http://mozilla.org/MPL/2.0/](http://mozilla.org/MPL/2.0/)
-
-The quick-and-dirty is you can do whatever if modifications to MathQuill are in
-public GitHub forks. (Other ways to publicize modifications are also fine, as
-are private use modifications. See also: [MPL 2.0 FAQ](https://www.mozilla.org/en-US/MPL/2.0/FAQ/))
